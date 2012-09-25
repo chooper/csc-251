@@ -69,9 +69,9 @@ def main(port):
     print 'I am listening'
 
     while 1:
-        connection_socket, addr = server_socket.accept()
+        conn_socket, addr = server_socket.accept()
 
-        req = HTTPRequest(connection_socket, addr)
+        req = HTTPRequest(conn_socket, addr)
         req.handle()
 
         headers = [
