@@ -2,9 +2,10 @@
 
 """
 UDP client that sends simple ping-like requests.
+
+Please see the README for more information, including the specification.
 """
 
-from __future__ import division
 import time, socket
 
 RECV_BUFFER     = 1024 # bytes
