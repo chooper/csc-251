@@ -5,6 +5,7 @@ import sys
 import socket
 
 LISTEN_IP = '0.0.0.0'
+LISTEN_BACKLOG = 1
 RECV_BUFFER = 1024
 DOCROOT = os.path.join(os.path.dirname(__file__), 'docroot')
 
@@ -63,8 +64,10 @@ class HTTPRequest(object):
 def main(port):
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.bind( (LISTEN_IP, port) )
-    server_socket.listen(1)
+    server_socket.listen(LISTEN_BACKLOG)
+
     print 'I am listening'
+
     while 1:
         connection_socket, addr = server_socket.accept()
 
