@@ -4,25 +4,51 @@ import os, os.path
 import sys
 import socket
 
+LISTEN_IP = '0.0.0.0'
+RECV_BUFFER = 1024
 DOCROOT = os.path.join(os.path.dirname(__file__), 'docroot')
 
-def main(port):
-    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.bind(('',port))
-    server_socket.listen(1)
-    print 'I am listening'
-    while 1:
-        connection_socket, addr = server_socket.accept()
-        data = connection_socket.recv(1024)
+class HTTPRequest(object):
+
+    socket = None
+    peer = None
+    headers = {}
+    method = None
+    protocol = None
+    uri = None
+    uri_path = None
+
+    def __init__(self, conn_socket, conn_addr):
+        self.socket = conn_socket
+        self.peer = conn_addr
+
+    def handle(self):
+        """Handle request"""
+        data = self.socket.recv(RECV_BUFFER)
         print data
+        # TODO: Detect end of headers
         request_headers = [l.strip() for l in data.split("\n")]
 
         # Parse request
         method, uri, protocol = request_headers[0].split(' ')
+        for header in request_headers[1:]:
+            if header == '':
+                continue
+            header_parts = header.split(':')
+            header_key = header_parts[0].strip()
+            header_value = header_parts[1].strip()
+            self.headers[header_key] = header_value
+
+            print 'H =>', header
+
         # TODO: url decode
         assert method in ['GET']    # TODO: 405s for unimplemented methods
         assert protocol in ['HTTP/1.0', 'HTTP/1.1']
         assert uri.find('..') == -1 # Attempt at blocking directory traversal
+
+        self.method = method
+        self.protocol = protocol
+        self.uri = uri
 
         # normalize urls
         if not uri.startswith('/'):
@@ -31,9 +57,20 @@ def main(port):
         if uri == '/': 
             uri = '/index.html'
 
-        local_path = os.path.join(DOCROOT, uri[1:])
+        self.uri_path = os.path.join(DOCROOT, uri[1:])
 
         # TODO: MIME type detection
+
+def main(port):
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.bind( (LISTEN_IP, port) )
+    server_socket.listen(1)
+    print 'I am listening'
+    while 1:
+        connection_socket, addr = server_socket.accept()
+
+        req = HTTPRequest(connection_socket, addr)
+        req.handle()
 
         headers = [
             "HTTP/1.1 200 OK",
@@ -41,19 +78,19 @@ def main(port):
             "Content-Type: text/html", ]
 
         try:
-            with open(local_path,'r') as requested_file:
+            with open(req.uri_path, 'r') as requested_file:
                 # send headers
-                connection_socket.send("\r\n".join(headers))
+                req.socket.send("\r\n".join(headers))
                 # mark end of headers
-                connection_socket.send("\r\n\r\n")
+                req.socket.send("\r\n\r\n")
                 # send content
-                connection_socket.send(requested_file.read())
+                req.socket.send(requested_file.read())
                 requested_file.close()
         except IOError: # file not found
-            connection_socket.send("HTTP/1.1 404 Not Found\r\n\r\n")
-            connection_socket.send("These aren't the droids you're looking for.")
+            req.socket.send("HTTP/1.1 404 Not Found\r\n\r\n")
+            req.socket.send("These aren't the droids you're looking for.")
         finally:
-            connection_socket.close()
+            req.socket.close()
 
 
 if __name__ == '__main__':
