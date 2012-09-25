@@ -4,16 +4,16 @@ import os, os.path
 import sys
 import socket
 
-DOCROOT = os.path.join(os.path.dirname(__file__),'docroot')
+DOCROOT = os.path.join(os.path.dirname(__file__), 'docroot')
 
-def main(serverport):
-    serverSocket = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-    serverSocket.bind(('',serverport))
-    serverSocket.listen(1)
+def main(port):
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.bind(('',port))
+    server_socket.listen(1)
     print 'I am listening'
     while 1:
-        connectionSocket, addr = serverSocket.accept()
-        data = connectionSocket.recv(1024)
+        connection_socket, addr = server_socket.accept()
+        data = connection_socket.recv(1024)
         print data
         request_headers = [l.strip() for l in data.split("\n")]
 
@@ -43,17 +43,17 @@ def main(serverport):
         try:
             with open(local_path,'r') as requested_file:
                 # send headers
-                connectionSocket.send("\r\n".join(headers))
+                connection_socket.send("\r\n".join(headers))
                 # mark end of headers
-                connectionSocket.send("\r\n\r\n")
+                connection_socket.send("\r\n\r\n")
                 # send content
-                connectionSocket.send(requested_file.read())
+                connection_socket.send(requested_file.read())
                 requested_file.close()
         except IOError: # file not found
-            connectionSocket.send("HTTP/1.1 404 Not Found\r\n\r\n")
-            connectionSocket.send("These aren't the droids you're looking for.")
+            connection_socket.send("HTTP/1.1 404 Not Found\r\n\r\n")
+            connection_socket.send("These aren't the droids you're looking for.")
         finally:
-            connectionSocket.close()
+            connection_socket.close()
 
 
 if __name__ == '__main__':
