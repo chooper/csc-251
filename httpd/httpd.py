@@ -82,17 +82,17 @@ def main(port):
         try:
             with open(req.uri_path, 'r') as requested_file:
                 # send headers
-                req.socket.send("\r\n".join(headers))
+                conn_socket.send("\r\n".join(headers))
                 # mark end of headers
-                req.socket.send("\r\n\r\n")
+                conn_socket.send("\r\n\r\n")
                 # send content
-                req.socket.send(requested_file.read())
+                conn_socket.send(requested_file.read())
                 requested_file.close()
         except IOError: # file not found
-            req.socket.send("HTTP/1.1 404 Not Found\r\n\r\n")
-            req.socket.send("These aren't the droids you're looking for.")
+            conn_socket.send("HTTP/1.1 404 Not Found\r\n\r\n")
+            conn_socket.send("These aren't the droids you're looking for.")
         finally:
-            req.socket.close()
+            conn_socket.close()
 
 
 if __name__ == '__main__':
