@@ -6,7 +6,7 @@ at ECSU. The spec is behind a login form, but essentially:
 
 Message format is a space-separated ascii string in the form of:
 
-    "ping sequence_number time"
+    ping sequence_number time
 
 Where ``sequence_number`` is an integer that starts at 1 and ``time`` is the
 time that the message was sent, in no particular format. For this assignment, I
