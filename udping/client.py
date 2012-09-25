@@ -19,7 +19,8 @@ def timestamp():
 
 def handle_message(data, addr):
     """Parse an incoming 'pong' message and return a tuple of
-    (``sender_address``, ``sequence_number``, ``round_trip_time``).
+    (``sender_address``, ``sequence_number``, ``round_trip_time``). Returns
+    None on error.
 
     ``sender_address`` is a tuple of ``ip`` (string) and ``port`` (int).
     ``sequence_number`` is an integer in the range [0, inf).
