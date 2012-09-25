@@ -51,10 +51,11 @@ def main(dst_ip, port):
 
     for i in xrange(NUM_REQUESTS):
         send_time = timestamp()
+        seq_num = i + 1
 
         # Build the message and send it
         # - Format: "<cmd> <seq #> <time>"
-        msg = 'ping {0} {1}'.format(i, send_time)
+        msg = 'ping {0} {1}'.format(seq_num, send_time)
         client_socket.sendto(msg, (dst_ip, int(port)))
 
         # Our receiving is currently coupled to our sending :<
