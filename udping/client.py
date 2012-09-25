@@ -17,13 +17,26 @@ def timestamp():
 
 
 def handle_message(data, addr):
+    """Parse an incoming 'pong' message and return a tuple of
+    (``sender_address``, ``sequence_number``, ``round_trip_time``).
+
+    ``sender_address`` is a tuple of ``ip`` (string) and ``port`` (int).
+    ``sequence_number`` is an integer in the range [0, inf).
+    ``round_trip_time`` is an integer, unit ms, in the range [0, ``recv_timeout``).
+    """
+
     receive_time = timestamp()
 
     # Parse the received message
     response = data.split(' ')
-    assert len(response) == 3
+
+    if len(response) != 3:
+        return
+
     cmd, seq_num, send_time = response[0], int(response[1]), int(response[2])
-    assert cmd == 'pong'
+
+    if cmd != 'pong':
+        return
 
     rtt = receive_time - send_time
 
