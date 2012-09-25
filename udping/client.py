@@ -16,7 +16,7 @@ def main(dst_ip, port):
     client_socket.settimeout(RECV_TIMEOUT)
 
     for i in xrange(NUM_REQUESTS):
-        start = time.time()
+        start = int(time.time() * 1000) # send time in ms
         # message format: <cmd> <seq #> <time>
         msg = 'ping {0} {1}'.format(i, start)
         client_socket.sendto(msg, (dst_ip, int(port)))
@@ -27,11 +27,18 @@ def main(dst_ip, port):
             print 'Request timed out'
             continue
         else:
-            end = time.time()
-            time_in_ms = int((end - start) * 1000)
+            end = int(time.time() * 1000)
+            # parse the received message
+            response = data.split(' ')
+            assert len(response) == 3
 
-            print 'Received:', data, 'from', addr, 'rtt={0} ms)' \
-                .format(time_in_ms)
+            cmd, seq_num, timestamp = response
+            assert cmd == 'pong'
+
+            time_in_ms = end - int(timestamp)
+
+            print 'pong! seq={0}, rtt={1} ms from {2}' \
+                .format(seq_num, time_in_ms, addr)
 
         time.sleep(0.5)
 
