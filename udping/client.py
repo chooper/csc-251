@@ -11,34 +11,49 @@ RECV_BUFFER     = 1024 # bytes
 RECV_TIMEOUT    = 1    # seconds
 NUM_REQUESTS    = 10
 
+def timestamp():
+    """Returns current timestamp in milliseconds"""
+    return int(time.time() * 1000)
+
+
+def handle_message(data, addr):
+    receive_time = timestamp()
+
+    # Parse the received message
+    response = data.split(' ')
+    assert len(response) == 3
+    cmd, seq_num, send_time = response[0], int(response[1]), int(response[2])
+    assert cmd == 'pong'
+
+    rtt = receive_time - send_time
+
+    return addr, seq_num, rtt
+
+
 def main(dst_ip, port):
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     client_socket.settimeout(RECV_TIMEOUT)
 
     for i in xrange(NUM_REQUESTS):
-        start = int(time.time() * 1000) # send time in ms
-        # message format: <cmd> <seq #> <time>
-        msg = 'ping {0} {1}'.format(i, start)
+        send_time = timestamp()
+
+        # Build the message and send it
+        # - Format: "<cmd> <seq #> <time>"
+        msg = 'ping {0} {1}'.format(i, send_time)
         client_socket.sendto(msg, (dst_ip, int(port)))
 
+        # Our receiving is currently coupled to our sending :<
         try:
             data, addr = client_socket.recvfrom(RECV_BUFFER)
         except socket.timeout:
             print 'Request timed out'
             continue
         else:
-            end = int(time.time() * 1000)
-            # parse the received message
-            response = data.split(' ')
-            assert len(response) == 3
+            response = handle_message(data, addr)
 
-            cmd, seq_num, timestamp = response
-            assert cmd == 'pong'
-
-            time_in_ms = end - int(timestamp)
-
-            print 'pong! seq={0}, rtt={1} ms from {2}' \
-                .format(seq_num, time_in_ms, addr)
+            if response:
+                print 'pong! seq={1}, rtt={2} ms from {0}' \
+                    .format(*response)
 
         time.sleep(0.5)
 
