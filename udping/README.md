@@ -2,9 +2,8 @@ UDP Pinger
 ==========
 
 This was written for a CS class, specifically CSC 251 aka Net-Centric Computing
-at ECSU. The spec is behind a login form, but essentially:
-
-Message format is a space-separated ascii string in the form of:
+at ECSU. The spec is behind a login form, but essentially the message format is
+a space-separated ascii string in the form of:
 
     ping sequence_number time
 
