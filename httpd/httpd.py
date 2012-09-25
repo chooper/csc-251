@@ -26,10 +26,10 @@ class HTTPRequest(object):
         """Handle request"""
         data = self.socket.recv(RECV_BUFFER)
         print data
-        # TODO: Detect end of headers
-        request_headers = [l.strip() for l in data.split("\n")]
 
+        # TODO: Detect end of headers
         # Parse request
+        request_headers = [l.strip() for l in data.split("\n")]
         method, uri, protocol = request_headers[0].split(' ')
         for header in request_headers[1:]:
             if header == '':
@@ -38,8 +38,6 @@ class HTTPRequest(object):
             header_key = header_parts[0].strip()
             header_value = header_parts[1].strip()
             self.headers[header_key] = header_value
-
-            print 'H =>', header
 
         # TODO: url decode
         assert method in ['GET']    # TODO: 405s for unimplemented methods
@@ -60,6 +58,7 @@ class HTTPRequest(object):
         self.uri_path = os.path.join(DOCROOT, uri[1:])
 
         # TODO: MIME type detection
+
 
 def main(port):
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
