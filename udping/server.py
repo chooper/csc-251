@@ -9,7 +9,7 @@ Please see the README for more information, including the specification.
 
 import socket, random
 
-LISTEN_ON       = '127.0.0.1'
+LISTEN_ON       = '0.0.0.0'
 RECV_BUFFER     = 1024  # bytes
 RECV_TIMEOUT    = 1     # seconds
 PACKET_LOSS     = 0.3   # per-1
