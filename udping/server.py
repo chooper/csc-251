@@ -19,6 +19,8 @@ def main(port):
     server_socket.settimeout(RECV_TIMEOUT)
     server_socket.bind( (LISTEN_ON, int(port)) )
 
+    print 'Listening on {0}:{1}'.format(LISTEN_ON, port)
+
     while True:
         try:
             data, addr = server_socket.recvfrom(RECV_BUFFER)
