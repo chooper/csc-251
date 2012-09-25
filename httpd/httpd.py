@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 
-import os
+import os, os.path
 import sys
 import socket
 
-# TODO: Don't do this shit
-DOCROOT = '/home/chooper/projects/csc251/crapserver/docroot'
+DOCROOT = os.path.join(os.path.dirname(__file__),'docroot')
 
 def main(serverport):
     serverSocket = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
