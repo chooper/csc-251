@@ -108,22 +108,33 @@ class HTTPResponse(object):
         self.socket.close()
 
 
+class HTTPServer(object):
+    def __init__(self, port, listen_ip=LISTEN_IP, listen_backlog=LISTEN_BACKLOG):
+        self.port = port
+        self.listen_ip = listen_ip
+        self.listen_backlog = listen_backlog
+
+    def setup(self):
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socket.bind( (self.listen_ip, self.port) )
+        self.socket.listen(self.listen_backlog)
+
+    def run(self):
+        while 1:
+            conn_socket, addr = self.socket.accept()
+
+            req = HTTPRequest(conn_socket, addr)
+            req.handle()
+
+            rep = HTTPResponse(req)
+            rep.prepare()
+            rep.finish()
+
+
 def main(port):
-    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.bind( (LISTEN_IP, port) )
-    server_socket.listen(LISTEN_BACKLOG)
-
-    print 'I am listening'
-
-    while 1:
-        conn_socket, addr = server_socket.accept()
-
-        req = HTTPRequest(conn_socket, addr)
-        req.handle()
-
-        rep = HTTPResponse(req)
-        rep.prepare()
-        rep.finish()
+    server = HTTPServer(port)
+    server.setup()
+    server.run()
 
 
 if __name__ == '__main__':
