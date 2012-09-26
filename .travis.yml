@@ -4,5 +4,5 @@ python:
   - "2.7"
 # command to install dependencies
 install: "cd httpd && pip install -r requirements.txt --use-mirrors"
-# command to run tests
-script: "cd httpd && nosetests"
+# command to run tests (this runs from pwd of install command)
+script: "nosetests"
