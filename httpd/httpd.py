@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 
 import os, os.path
-import sys
-import socket
+import sys, socket, threading
 import cStringIO
 
 LISTEN_IP = '0.0.0.0'
@@ -137,25 +136,27 @@ class HTTPServer(object):
         self.socket.bind( (self.listen_ip, self.port) )
         self.socket.listen(self.listen_backlog)
 
+    def handle_connection(self, conn_socket, addr):
+        error = None
+        error_code = None
+        error_msg = None
+
+        req = HTTPRequest(conn_socket, addr)
+        error = req.handle()
+
+        rep = HTTPResponse(req)
+        if error:
+            error_code, error_msg = error
+            rep.prepare(error_code)
+            rep.http_error(error_code, error_msg)
+        else:
+            rep.prepare()
+        rep.finish()
+
     def run(self):
         while 1:
-            error = None
-            error_code = None
-            error_msg = None
-
             conn_socket, addr = self.socket.accept()
-
-            req = HTTPRequest(conn_socket, addr)
-            error = req.handle()
-
-            rep = HTTPResponse(req)
-            if error:
-                error_code, error_msg = error
-                rep.prepare(error_code)
-                rep.http_error(error_code, error_msg)
-            else:
-                rep.prepare()
-            rep.finish()
+            self.handle_connection(conn_socket, addr)
 
 
 def main(port):
