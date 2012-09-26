@@ -5,9 +5,10 @@ import sys, socket, threading
 import cStringIO
 
 # TODO: Request logging
+# TODO: Implement better control of threading
 
 LISTEN_IP = '0.0.0.0'
-LISTEN_BACKLOG = 1
+LISTEN_BACKLOG = -1
 RECV_BUFFER = 1024
 DOCROOT = os.path.join(os.path.dirname(__file__), 'docroot')
 
