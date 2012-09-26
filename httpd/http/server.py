@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import socket, threading
+import socket, cStringIO, threading
 from .request import HTTPRequest
 from .response import HTTPResponse
 
@@ -8,6 +8,7 @@ from .response import HTTPResponse
 # TODO: Implement better control of threading
 # TODO: Strip these globals out of here and pass them in from the app
 
+RECV_BUFFER = 1024
 LISTEN_IP = '0.0.0.0'
 LISTEN_BACKLOG = -1
 
@@ -36,16 +37,24 @@ class HTTPServer(object):
         error_code = None
         error_msg = None
 
-        req = HTTPRequest(conn_socket, addr)
+        # Write the request into a buffer
+        buf = cStringIO.StringIO()
+        buf.write(conn_socket.recv(RECV_BUFFER))
+
+        # Process the response
+        req = HTTPRequest(buf, addr)
         error = req.handle()
 
-        rep = HTTPResponse(req)
+        # Build the response
+        rep = HTTPResponse(conn_socket, req)
         if error:
             error_code, error_msg = error
             rep.prepare(error_code)
             rep.http_error(error_code, error_msg)
         else:
             rep.prepare()
+
+        # Send the response
         rep.finish()
 
     def run(self):

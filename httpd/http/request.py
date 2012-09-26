@@ -3,19 +3,15 @@
 import __main__
 import os.path
 
-RECV_BUFFER = 1024
 DOCROOT = os.path.join(os.path.dirname(__main__.__file__), 'docroot')
 
 class HTTPRequest(object):
 
     """Performs the initial handling of HTTP request. Generally an
     instance of this object will be passed to an ``HTTPResponse`` object.
-
-    WARNING: This should not send anything over the client socket
-            (``self.socket``).
     """
 
-    socket = None
+    buffer = None
     peer = None
     headers = {}
     method = None
@@ -23,8 +19,8 @@ class HTTPRequest(object):
     uri = None
     uri_path = None
 
-    def __init__(self, conn_socket, conn_addr, docroot=DOCROOT):
-        self.socket = conn_socket
+    def __init__(self, request_buffer, conn_addr, docroot=DOCROOT):
+        self.buffer = request_buffer
         self.peer = conn_addr
 
     def handle(self):
@@ -33,7 +29,7 @@ class HTTPRequest(object):
         Returns errors encountered or None if the request is valid. Errors
         are a tuple in the form of (http_error, message).
         """
-        data = self.socket.recv(RECV_BUFFER)
+        data = self.buffer.getvalue()
         print data
 
         # Parse the request

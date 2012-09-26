@@ -18,9 +18,9 @@ class HTTPResponse(object):
     }
     _rep_stream = None
 
-    def __init__(self, request):
+    def __init__(self, socket, request):
+        self.socket = socket
         self.request = request
-        self.socket = request.socket # for convenience
 
     @property
     def status(self):
