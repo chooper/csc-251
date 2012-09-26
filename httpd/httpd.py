@@ -4,6 +4,8 @@ import os, os.path
 import sys, socket, threading
 import cStringIO
 
+# TODO: Request logging
+
 LISTEN_IP = '0.0.0.0'
 LISTEN_BACKLOG = 1
 RECV_BUFFER = 1024
@@ -156,7 +158,10 @@ class HTTPServer(object):
     def run(self):
         while 1:
             conn_socket, addr = self.socket.accept()
-            self.handle_connection(conn_socket, addr)
+            handler_thread = threading.Thread(
+                target=self.handle_connection,
+                args=(conn_socket, addr)
+            ).start()
 
 
 def main(port):
