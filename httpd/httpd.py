@@ -3,6 +3,7 @@
 import os, os.path
 import sys
 import socket
+import cStringIO
 
 LISTEN_IP = '0.0.0.0'
 LISTEN_BACKLOG = 1
@@ -61,6 +62,52 @@ class HTTPRequest(object):
         # TODO: MIME type detection
 
 
+class HTTPResponse(object):
+
+    request = None
+    code = None
+    version = '1.1' # This probably isn't true
+    headers = {
+        'Connection': 'close',
+    }
+    _rep_stream = None
+
+    def __init__(self, request):
+        self.request = request
+        self.socket = request.socket # for convenience
+
+    @property
+    def status(self):
+        assert self.code
+        reasons = { # TODO: This doesn't belong here
+            200: 'OK',
+            404: 'Not found',
+        }
+        reason = reasons[int(self.code)]
+        return "HTTP/{0} {1} {2}".format(self.version, self.code, reason)
+
+    def prepare(self):
+        """Populate headers and prepare to responde to the request"""
+        try:
+            self.code = 200
+            self._rep_stream = open(self.request.uri_path, 'r')
+            self.headers['Content-Type'] = 'text/html'
+        except IOError:
+            # TODO: Check real error
+            self.code = 404
+            self.headers['Content-Type'] = 'text/plain'
+            self._rep_stream = cStringIO.StringIO("File not found\n")
+
+    def finish(self):
+        self.socket.sendall(self.status + "\r\n")
+        for header, value in self.headers.iteritems():
+            self.socket.sendall( "{0}: {1}\r\n".format(header, value) )
+        self.socket.sendall("\r\n")  # end of headers
+        self.socket.sendall( self._rep_stream.read() )
+        self._rep_stream.close()
+        self.socket.close()
+
+
 def main(port):
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.bind( (LISTEN_IP, port) )
@@ -74,25 +121,9 @@ def main(port):
         req = HTTPRequest(conn_socket, addr)
         req.handle()
 
-        headers = [
-            "HTTP/1.1 200 OK",
-            "Connection: close",
-            "Content-Type: text/html", ]
-
-        try:
-            with open(req.uri_path, 'r') as requested_file:
-                # send headers
-                conn_socket.send("\r\n".join(headers))
-                # mark end of headers
-                conn_socket.send("\r\n\r\n")
-                # send content
-                conn_socket.send(requested_file.read())
-                requested_file.close()
-        except IOError: # file not found
-            conn_socket.send("HTTP/1.1 404 Not Found\r\n\r\n")
-            conn_socket.send("These aren't the droids you're looking for.")
-        finally:
-            conn_socket.close()
+        rep = HTTPResponse(req)
+        rep.prepare()
+        rep.finish()
 
 
 if __name__ == '__main__':
