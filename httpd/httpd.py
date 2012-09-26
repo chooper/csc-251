@@ -14,6 +14,13 @@ DOCROOT = os.path.join(os.path.dirname(__file__), 'docroot')
 
 class HTTPRequest(object):
 
+    """Performs the initial handling of HTTP request. Generally an
+    instance of this object will be passed to an ``HTTPResponse`` object.
+
+    WARNING: This should not send anything over the client socket
+            (``self.socket``).
+    """
+
     socket = None
     peer = None
     headers = {}
@@ -27,17 +34,24 @@ class HTTPRequest(object):
         self.peer = conn_addr
 
     def handle(self):
-        """Handle request. Returns errors encountered or None if the request is
-        valid."""
+        """Validates and handles the receiving part of a HTTP request.
+
+        Returns errors encountered or None if the request is valid. Errors
+        are a tuple in the form of (http_error, message).
+        """
         data = self.socket.recv(RECV_BUFFER)
         print data
 
-        # Parse request
+        # Parse the request
+        #
         # TODO: Detect end of headers (req'd for POST and PUT support)
         # TODO: urldecode the URL
         # TODO: request variables
+        #
         request_headers = [l.strip() for l in data.split("\n")]
         self.method, self.uri, self.protocol = request_headers[0].split(' ')
+
+        # Parse headers
         for header in request_headers[1:]:
             if header == '':
                 continue
@@ -45,7 +59,11 @@ class HTTPRequest(object):
             header_key = header_parts[0].strip()
             header_value = header_parts[1].strip()
             self.headers[header_key] = header_value
+        #
+        ####
 
+        # Validate the request
+        #
         if self.protocol not in ['HTTP/1.0', 'HTTP/1.1']:
             return (505, 'HTTP Version Not Supported')
 
@@ -56,20 +74,28 @@ class HTTPRequest(object):
         if self.uri.find('..') > -1:
             return (403, 'Forbidden')
 
-        # normalize urls
+        #
+        ####
+
+        # Normalize provided URL (might not belong here)
         if not self.uri.startswith('/'):
             self.uri = '/' + self.uri
-
         if self.uri == '/': 
             self.uri = '/index.html'
 
+        # Determine requested resource's local path
         self.uri_path = os.path.join(DOCROOT, self.uri[1:])
 
-        # TODO: MIME type detection
         return None
 
 
 class HTTPResponse(object):
+
+    """Handles the actual response to a given HTTPRequest.
+
+    Performs the requested resource and performs all I/O with the
+    client.
+    """
 
     request = None
     code = None
@@ -85,7 +111,11 @@ class HTTPResponse(object):
 
     @property
     def status(self):
-        assert self.code
+        """Returns the "status" header for the responses current HTTP
+        status code and version.
+        """
+        assert self.code and int(self.code)
+
         reasons = { # TODO: This doesn't belong here
             200: 'OK',
             403: 'Forbidden',
@@ -98,27 +128,32 @@ class HTTPResponse(object):
         return "HTTP/{0} {1} {2}".format(self.version, self.code, reason)
 
     def http_error(self, code, msg):
+        """Prepares the response for returning a given HTTP error."""
         self.code = code
         self.headers['Content-Type'] = 'text/plain'
         self._rep_stream = cStringIO.StringIO(msg + "\n")
 
     def _prepare(self, code=None):
-        """Populate headers and prepare to responde to the request"""
+        """Populate headers and prepare to respond to the request."""
         try:
             self.code = 200
             self._rep_stream = open(self.request.uri_path, 'r')
             self.headers['Content-Type'] = 'text/html'
         except IOError:
-            # TODO: Check real error
+            # TODO: Check real error (e.g., not found vs permissions)
             self.http_error(404, "File not found")
 
     def prepare(self, code=None):
+        """Wrapper to ``self._prepare``. It's job is simply to catch any
+        errors during a response and return a HTTP error 500 should it
+        not be able to recover."""
         try:
             return self._prepare(code)
         except:
             self.http_error(500, 'Internal error')
 
     def finish(self):
+        """Send the response and close all sockets."""
         self.socket.sendall(self.status + "\r\n")
         for header, value in self.headers.iteritems():
             self.socket.sendall( "{0}: {1}\r\n".format(header, value) )
