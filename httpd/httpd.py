@@ -81,12 +81,18 @@ class HTTPResponse(object):
         assert self.code
         reasons = { # TODO: This doesn't belong here
             200: 'OK',
-            404: 'Not found',
+            404: 'Not Found',
+            500: 'Internal Server Error',
         }
         reason = reasons[int(self.code)]
         return "HTTP/{0} {1} {2}".format(self.version, self.code, reason)
 
-    def prepare(self):
+    def http_error(self, code, msg):
+        self.code = code
+        self.headers['Content-Type'] = 'text/plain'
+        self._rep_stream = cStringIO.StringIO(msg + "\n")
+
+    def _prepare(self, code=None):
         """Populate headers and prepare to responde to the request"""
         try:
             self.code = 200
@@ -94,9 +100,13 @@ class HTTPResponse(object):
             self.headers['Content-Type'] = 'text/html'
         except IOError:
             # TODO: Check real error
-            self.code = 404
-            self.headers['Content-Type'] = 'text/plain'
-            self._rep_stream = cStringIO.StringIO("File not found\n")
+            self.http_error(404, "File not found")
+
+    def prepare(self, code=None):
+        try:
+            return self._prepare(code)
+        except:
+            self.http_error(500, 'Internal error')
 
     def finish(self):
         self.socket.sendall(self.status + "\r\n")
