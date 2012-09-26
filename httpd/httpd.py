@@ -25,14 +25,17 @@ class HTTPRequest(object):
         self.peer = conn_addr
 
     def handle(self):
-        """Handle request"""
+        """Handle request. Returns errors encountered or None if the request is
+        valid."""
         data = self.socket.recv(RECV_BUFFER)
         print data
 
-        # TODO: Detect end of headers
         # Parse request
+        # TODO: Detect end of headers (req'd for POST and PUT support)
+        # TODO: urldecode the URL
+        # TODO: request variables
         request_headers = [l.strip() for l in data.split("\n")]
-        method, uri, protocol = request_headers[0].split(' ')
+        self.method, self.uri, self.protocol = request_headers[0].split(' ')
         for header in request_headers[1:]:
             if header == '':
                 continue
@@ -41,25 +44,27 @@ class HTTPRequest(object):
             header_value = header_parts[1].strip()
             self.headers[header_key] = header_value
 
-        # TODO: url decode
-        assert method in ['GET']    # TODO: 405s for unimplemented methods
-        assert protocol in ['HTTP/1.0', 'HTTP/1.1']
-        assert uri.find('..') == -1 # Attempt at blocking directory traversal
+        if self.protocol not in ['HTTP/1.0', 'HTTP/1.1']:
+            return (505, 'HTTP Version Not Supported')
 
-        self.method = method
-        self.protocol = protocol
-        self.uri = uri
+        if self.method not in ['GET']:
+            return (405, 'Not Implemented')
+
+        # Lame attempt at blocking directory traversal
+        if self.uri.find('..') > -1:
+            return (403, 'Forbidden')
 
         # normalize urls
-        if not uri.startswith('/'):
-            uri = '/' + uri
+        if not self.uri.startswith('/'):
+            self.uri = '/' + self.uri
 
-        if uri == '/': 
-            uri = '/index.html'
+        if self.uri == '/': 
+            self.uri = '/index.html'
 
-        self.uri_path = os.path.join(DOCROOT, uri[1:])
+        self.uri_path = os.path.join(DOCROOT, self.uri[1:])
 
         # TODO: MIME type detection
+        return None
 
 
 class HTTPResponse(object):
@@ -81,8 +86,11 @@ class HTTPResponse(object):
         assert self.code
         reasons = { # TODO: This doesn't belong here
             200: 'OK',
+            403: 'Forbidden',
             404: 'Not Found',
+            405: 'Not Implemented',
             500: 'Internal Server Error',
+            505: 'HTTP Version Not Supported',
         }
         reason = reasons[int(self.code)]
         return "HTTP/{0} {1} {2}".format(self.version, self.code, reason)
@@ -131,13 +139,22 @@ class HTTPServer(object):
 
     def run(self):
         while 1:
+            error = None
+            error_code = None
+            error_msg = None
+
             conn_socket, addr = self.socket.accept()
 
             req = HTTPRequest(conn_socket, addr)
-            req.handle()
+            error = req.handle()
 
             rep = HTTPResponse(req)
-            rep.prepare()
+            if error:
+                error_code, error_msg = error
+                rep.prepare(error_code)
+                rep.http_error(error_code, error_msg)
+            else:
+                rep.prepare()
             rep.finish()
 
 
