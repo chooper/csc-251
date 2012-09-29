@@ -72,7 +72,7 @@ class TestHTTPRequestForIndex(unittest.TestCase):
         buf = StringIO(self.request)
         req = HTTPRequest(buf, self.test_addr)
         result = req.handle()
-        self.assertIs(result, None)  # make sure no errors are returned
+        self.assertEqual(result, None)  # make sure no errors are returned
 
 
 class TestHTTPRequestForRoot(unittest.TestCase):
@@ -89,6 +89,6 @@ class TestHTTPRequestForRoot(unittest.TestCase):
         buf = StringIO(self.request)
         req = HTTPRequest(buf, self.test_addr)
         result = req.handle()
-        self.assertIs(result, None)  # make sure no errors are returned
+        self.assertEqual(result, None)  # make sure no errors are returned
 
 
