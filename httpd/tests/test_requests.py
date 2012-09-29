@@ -18,7 +18,7 @@ class TestHTTPRequestForUnsupportedMethod(unittest.TestCase):
         buf = StringIO(self.request)
         req = HTTPRequest(buf, self.test_addr)
         result = req.handle()
-        self.assertIsNot(result, None)  # make sure no errors are returned
+        self.assertNotEqual(result, None)  # make sure no errors are returned
         self.assertEqual(result[0], 405)
 
 
@@ -36,7 +36,7 @@ class TestHTTPRequestForBadProtocol(unittest.TestCase):
         buf = StringIO(self.request)
         req = HTTPRequest(buf, self.test_addr)
         result = req.handle()
-        self.assertIsNot(result, None)  # make sure no errors are returned
+        self.assertNotEqual(result, None)  # make sure no errors are returned
         self.assertEqual(result[0], 505)
 
 
@@ -54,7 +54,7 @@ class TestHTTPRequestForDirTraversal(unittest.TestCase):
         buf = StringIO(self.request)
         req = HTTPRequest(buf, self.test_addr)
         result = req.handle()
-        self.assertIsNot(result, None)  # make sure no errors are returned
+        self.assertNotEqual(result, None)  # make sure no errors are returned
         self.assertEqual(result[0], 403)
 
 
