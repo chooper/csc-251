@@ -3,8 +3,6 @@
 import __main__
 import os.path
 
-DOCROOT = os.path.join(os.path.dirname(__main__.__file__), 'docroot')
-
 class HTTPRequest(object):
 
     """Performs the initial handling of HTTP request. Generally an
@@ -19,9 +17,10 @@ class HTTPRequest(object):
     uri = None
     uri_path = None
 
-    def __init__(self, request_buffer, conn_addr, docroot=DOCROOT):
+    def __init__(self, request_buffer, conn_addr, docroot='.'):
         self.buffer = request_buffer
         self.peer = conn_addr
+        self.docroot = docroot
 
     def handle(self):
         """Validates and handles the receiving part of a HTTP request.
@@ -74,7 +73,7 @@ class HTTPRequest(object):
             self.uri = '/index.html'
 
         # Determine requested resource's local path
-        self.uri_path = os.path.join(DOCROOT, self.uri[1:])
+        self.uri_path = os.path.join(self.docroot, self.uri[1:])
 
         return None
 

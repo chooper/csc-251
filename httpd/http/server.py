@@ -11,6 +11,7 @@ from .response import HTTPResponse
 RECV_BUFFER = 1024
 LISTEN_IP = '0.0.0.0'
 LISTEN_BACKLOG = -1
+DOCROOT = os.path.join(os.path.dirname(__main__.__file__), 'docroot')
 
 class HTTPServer(object):
 
@@ -42,7 +43,7 @@ class HTTPServer(object):
         buf.write(conn_socket.recv(RECV_BUFFER))
 
         # Process the response
-        req = HTTPRequest(buf, addr)
+        req = HTTPRequest(buf, addr, docroot=DOCROOT)
         error = req.handle()
 
         # Build the response
