@@ -24,18 +24,19 @@ You need Python 2.6-ish and the standard library.
 Example
 -------
 
-    $ ./server.py 7777
-    $ ./client.py localhost 7777 # run this in another terminal
-    Request timed out
-    pong! seq=1, rtt=0 ms from ('127.0.0.1', 7777)
-    pong! seq=2, rtt=1 ms from ('127.0.0.1', 7777)
+    $ python server.py 7777
+    $ python client.py localhost 7777 # run this in another terminal
+    pong! seq=1, rtt=1 ms from ('127.0.0.1', 7777)
+    pong! seq=2, rtt=0 ms from ('127.0.0.1', 7777)
     pong! seq=3, rtt=1 ms from ('127.0.0.1', 7777)
+    pong! seq=4, rtt=1 ms from ('127.0.0.1', 7777)
     Request timed out
-    pong! seq=5, rtt=1 ms from ('127.0.0.1', 7777)
-    pong! seq=6, rtt=0 ms from ('127.0.0.1', 7777)
-    pong! seq=7, rtt=1 ms from ('127.0.0.1', 7777)
-    pong! seq=8, rtt=0 ms from ('127.0.0.1', 7777)
+    pong! seq=6, rtt=1 ms from ('127.0.0.1', 7777)
     Request timed out
+    pong! seq=8, rtt=1 ms from ('127.0.0.1', 7777)
+    Request timed out
+    Request timed out
+    summary: 6/10 (40.0% loss) packets received, mean rtt = 0.83 ms
 
 The server will also print some debugging information.
 
