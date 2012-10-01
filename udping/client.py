@@ -78,8 +78,10 @@ def main(dst_ip, port):
 
         time.sleep(0.5)
 
-    average_rtt = sum(response_times) / len(response_times) if len(response_times) > 0 else 'N/A'
     loss_pct = timeout_counter / NUM_REQUESTS * 100
+    average_rtt = 'N/A'
+    if len(response_times) > 0:
+        average_rtt = sum(response_times) / len(response_times)
 
     print 'summary: {0}/{1} ({2:.1f}% loss) packets received, mean rtt = {3:.2f} ms' \
         .format(NUM_REQUESTS - timeout_counter, NUM_REQUESTS, loss_pct, average_rtt)
