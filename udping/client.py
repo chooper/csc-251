@@ -6,6 +6,7 @@ UDP client that sends simple ping-like requests.
 Please see the README for more information, including the specification.
 """
 
+from __future__ import division # floating point division
 import time, socket
 
 RECV_BUFFER     = 1024 # bytes
@@ -48,6 +49,8 @@ def handle_message(data, addr):
 def main(dst_ip, port):
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     client_socket.settimeout(RECV_TIMEOUT)
+    response_times = []
+    timeout_counter = 0
 
     for i in xrange(NUM_REQUESTS):
         send_time = timestamp()
@@ -63,6 +66,7 @@ def main(dst_ip, port):
             data, addr = client_socket.recvfrom(RECV_BUFFER)
         except socket.timeout:
             print 'Request timed out'
+            timeout_counter += 1
             continue
         else:
             response = handle_message(data, addr)
@@ -70,8 +74,15 @@ def main(dst_ip, port):
             if response:
                 print 'pong! seq={1}, rtt={2} ms from {0}' \
                     .format(*response)
+                response_times.append(response[2])
 
         time.sleep(0.5)
+
+    average_rtt = sum(response_times) / len(response_times) if len(response_times) > 0 else 'N/A'
+    loss_pct = timeout_counter / NUM_REQUESTS * 100
+
+    print 'summary: {0}/{1} ({2:.1f}% loss) packets received, mean rtt = {3:.2f} ms' \
+        .format(NUM_REQUESTS - timeout_counter, NUM_REQUESTS, loss_pct, average_rtt)
 
 
 if __name__ == '__main__':
