@@ -1,0 +1,4 @@
+# Sometimes github is offline which breaks Travis CI and I don't know
+# how to request another job besides re-pushing. This file is letting me
+# do that :S
+0
