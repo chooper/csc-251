@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
-import socket, cStringIO, threading
+import __main__
+import os.path, socket, cStringIO, threading
 from .request import HTTPRequest
 from .response import HTTPResponse
 
