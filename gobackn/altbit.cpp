@@ -42,6 +42,7 @@
 #define   A    0
 #define   B    1
 
+#define MSGSIZE 20
 #define TIMEOUT 500
 #define ACK "ACK"
 #define NACK "NACK" 
@@ -50,7 +51,7 @@
 /* 4 (students' code).  It contains the data (characters) to be delivered */
 /* to layer 5 via the students transport level protocol entities.         */
 struct msg {
-  char data[20];
+  char data[MSGSIZE];
   };
 
 /* a packet is the data unit passed from layer 4 (students code) to layer */
@@ -60,7 +61,7 @@ struct pkt {
    int seqnum;
    int acknum;
    int checksum;
-   char payload[20];
+   char payload[MSGSIZE];
     };
 
 /*** START Charles Hooper's Code ***/
@@ -85,7 +86,7 @@ bool pkt_checksum_valid(struct pkt *tgt_pkt)
     return (expectedChecksum == tgt_pkt->checksum);
 }
 
-struct pkt *make_pkt(int seqnum, char data[20])
+struct pkt *make_pkt(int seqnum, char data[MSGSIZE])
 {
     // make_pkt: Returns a pointer to a newly initialized packet
     struct pkt *gen_pkt;
@@ -102,7 +103,7 @@ struct pkt *make_pkt(int seqnum, char data[20])
 void send_ack(int caller, struct pkt *pkt_to_ack)
 {
     int seqnum = pkt_to_ack->seqnum;
-    char msg[20] = {'A','C','K',0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+    char msg[MSGSIZE] = {'A','C','K',0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
     struct pkt *ack_pkt = make_pkt(seqnum, msg);
     ack_pkt->acknum = pkt_to_ack->seqnum;
     tolayer3(caller, *ack_pkt);
@@ -112,7 +113,7 @@ void send_ack(int caller, struct pkt *pkt_to_ack)
 void send_nack(int caller, struct pkt *pkt_to_nack)
 {
     int seqnum = pkt_to_nack->seqnum;
-    char msg[20] = {'N','A','C','K',0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+    char msg[MSGSIZE] = {'N','A','C','K',0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
     struct pkt *nack_pkt = make_pkt(seqnum, msg);
     nack_pkt->acknum = 0;
     tolayer3(caller, *nack_pkt);
