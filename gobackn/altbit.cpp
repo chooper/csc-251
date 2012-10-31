@@ -130,11 +130,9 @@ void A_output(struct msg message)
 {
     printf("CCH> A_output> Got message\n");
     struct pkt *out_pkt;
-    int seqnum = 0;
+    int seqnum;
 
-    if(last_pkt)
-        seqnum = last_pkt->seqnum + 1;
-
+    seqnum = 1 ? (last_pkt && last_pkt->seqnum < 1) : 0;
     out_pkt = make_pkt(seqnum, message.data);
     last_pkt = out_pkt;
 
@@ -154,34 +152,33 @@ void A_input(struct pkt packet)
     // isChecksumValid
     if(pkt_checksum_valid(&packet)) {
         printf("CCH> A_input> Valid checksum\n");
-        stoptimer(A);
+
+        // isACK
+        if(strncmp(packet.payload, ACK, strlen(ACK)) == 0) {
+            if(packet.acknum == last_pkt->seqnum) {
+                printf("CCH> A_input> Received valid ACK\n");
+                last_ack = &packet;
+                stoptimer(A);
+            } else {
+                // We received an ACK we don't care about
+                printf("CCH> A_input> Received invalid ACK (ignoring)\n");
+            }
+        // isNACK
+        } else if (strncmp(packet.payload, NACK, strlen(ACK)) == 0) {
+            printf("CCH> A_input> Received NACK\n");
+            send_pkt(A, last_pkt);
+        } else {
+            // Message
+            stoptimer(A);
+            tolayer5(A, packet.payload);
+        }
     } else {
         printf("CCH> A_input> Invalid checksum\n");
         send_nack(A, &packet);
-        return;
-    }
-
-    // isACK
-    if(strncmp(packet.payload, ACK, strlen(ACK)) == 0) {
-        if(packet.acknum == last_pkt->seqnum) {
-            printf("CCH> A_input> Received valid ACK\n");
-            stoptimer(A);
-            last_ack = &packet;
-        }
-        // We received an ACK we don't care about
-        printf("CCH> A_input> Received invalid ACK (ignoring)\n");
-        return;
-    }
-
-    // isNACK
-    if(strncmp(packet.payload, NACK, strlen(ACK)) == 0) {
-        printf("CCH> A_input> Received NACK\n");
         stoptimer(A);
-        send_pkt(A, last_pkt);
+        starttimer(A, TIMEOUT);
         return;
     }
-
-    // Data was valid, pass it back to the application (if bidirectional)
 }
 
 /* called when A's timer goes off */
