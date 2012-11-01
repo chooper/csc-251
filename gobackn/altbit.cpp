@@ -132,7 +132,7 @@ void A_output(struct msg message)
     struct pkt *out_pkt;
     int seqnum;
 
-    seqnum = 1 ? (last_pkt && last_pkt->seqnum < 1) : 0;
+    seqnum = (last_pkt && last_pkt->seqnum < 1) ? 1 : 0;
     out_pkt = make_pkt(seqnum, message.data);
     last_pkt = out_pkt;
 
