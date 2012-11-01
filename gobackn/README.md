@@ -50,407 +50,197 @@ Go-Back-N
 
     EVENT time: 3518.971680,  type: 2, fromlayer3  entity: 0
     CCH> A_input> Got packet with seqnum 1
-    CCH> A_input> Invalid checksum, sending a NACK
+    CCH> A_input> Invalid checksum, refusing data
 
-    EVENT time: 3523.835205,  type: 2, fromlayer3  entity: 1
-    CCH> B_input> Got packet with seqnum 1
-    CCH> B_input> Checksum is valid
-    CCH> B_input> Received NACK, resending outstanding packets
-
-    EVENT time: 4018.971680,  type: 0, timerinterrupt   entity: 0
+    EVENT time: 4012.483887,  type: 0, timerinterrupt   entity: 0
     CCH> A_timerinterrupt> Called
     CCH> A_timerinterrupt> Packet timed out, resending outstanding packets
 
-    EVENT time: 4025.270020,  type: 2, fromlayer3  entity: 1
+    EVENT time: 4017.347412,  type: 2, fromlayer3  entity: 1
     CCH> B_input> Got packet with seqnum 1
     CCH> B_input> Checksum is valid
     CCH> B_input> Packet contains a message, ACKing and passing to app
     Warning: unable to cancel your timer. It wasn't running.
 
-    EVENT time: 4031.299561,  type: 2, fromlayer3  entity: 0
+    EVENT time: 4023.645752,  type: 2, fromlayer3  entity: 0
     CCH> A_input> Got packet with seqnum 1
-    CCH> A_input> Invalid checksum, sending a NACK
+    CCH> A_input> Invalid checksum, refusing data
 
-    EVENT time: 4038.954102,  type: 2, fromlayer3  entity: 1
-    CCH> B_input> Got packet with seqnum 1
-    CCH> B_input> Checksum is valid
-    CCH> B_input> Received NACK, resending outstanding packets
-
-    EVENT time: 4531.299805,  type: 0, timerinterrupt   entity: 0
+    EVENT time: 4512.483887,  type: 0, timerinterrupt   entity: 0
     CCH> A_timerinterrupt> Called
     CCH> A_timerinterrupt> Packet timed out, resending outstanding packets
 
-    EVENT time: 4534.712891,  type: 2, fromlayer3  entity: 1
+    EVENT time: 4518.513672,  type: 2, fromlayer3  entity: 1
     CCH> B_input> Got packet with seqnum 1
     CCH> B_input> Checksum is valid
     CCH> B_input> Packet contains a message, ACKing and passing to app
     Warning: unable to cancel your timer. It wasn't running.
 
-    EVENT time: 4536.514160,  type: 2, fromlayer3  entity: 0
+    EVENT time: 4526.168457,  type: 2, fromlayer3  entity: 0
     CCH> A_input> Got packet with seqnum 1
-    CCH> A_input> Invalid checksum, sending a NACK
+    CCH> A_input> Invalid checksum, refusing data
 
-    EVENT time: 4540.672852,  type: 2, fromlayer3  entity: 1
-    CCH> B_input> Got packet with seqnum 1
-    CCH> B_input> Checksum is valid
-    CCH> B_input> Received NACK, resending outstanding packets
-
-    EVENT time: 5036.514160,  type: 0, timerinterrupt   entity: 0
+    EVENT time: 5012.483887,  type: 0, timerinterrupt   entity: 0
     CCH> A_timerinterrupt> Called
     CCH> A_timerinterrupt> Packet timed out, resending outstanding packets
 
-    EVENT time: 5041.854492,  type: 2, fromlayer3  entity: 1
+    EVENT time: 5015.896973,  type: 2, fromlayer3  entity: 1
     CCH> B_input> Got packet with seqnum 1
     CCH> B_input> Checksum is valid
     CCH> B_input> Packet contains a message, ACKing and passing to app
     Warning: unable to cancel your timer. It wasn't running.
 
-    EVENT time: 5048.215332,  type: 2, fromlayer3  entity: 0
+    EVENT time: 5017.698242,  type: 2, fromlayer3  entity: 0
     CCH> A_input> Got packet with seqnum 1
-    CCH> A_input> Invalid checksum, sending a NACK
-              TOLAYER3: packet being corrupted
-
-    EVENT time: 5058.043457,  type: 2, fromlayer3  entity: 1
-    CCH> B_input> Got packet with seqnum 1
-    CCH> B_input> Invalid checksum, sending a NACK
-              TOLAYER3: packet being lost
-    Warning: unable to cancel your timer. It wasn't running.
+    CCH> A_input> Invalid checksum, refusing data
 
     EVENT time: 5209.402832,  type: 1, fromlayer5  entity: 0
     CCH> A_output> Got message from app layer, sending packet
     CCH> A_output> Appending window
-              TOLAYER3: packet being corrupted
     Warning: attempt to start a timer that is already started
 
-    EVENT time: 5214.981445,  type: 2, fromlayer3  entity: 1
-    CCH> B_input> Got packet with seqnum 2
-    CCH> B_input> Invalid checksum, sending a NACK
-
-    EVENT time: 5221.231445,  type: 2, fromlayer3  entity: 0
-    CCH> A_input> Got packet with seqnum 2
-    CCH> A_input> Checksum is valid
-    CCH> A_input> Received NACK, resending outstanding packets
-    Warning: attempt to start a timer that is already started
-    Warning: attempt to start a timer that is already started
-
-    EVENT time: 5225.135742,  type: 2, fromlayer3  entity: 1
-    CCH> B_input> Got packet with seqnum 1
-    CCH> B_input> Checksum is valid
-    CCH> B_input> Packet contains a message, ACKing and passing to app
-
-    EVENT time: 5231.453125,  type: 2, fromlayer3  entity: 1
+    EVENT time: 5216.604492,  type: 2, fromlayer3  entity: 1
     CCH> B_input> Got packet with seqnum 2
     CCH> B_input> Checksum is valid
     CCH> B_input> Packet contains a message, ACKing and passing to app
     Warning: unable to cancel your timer. It wasn't running.
 
-    EVENT time: 5232.254395,  type: 2, fromlayer3  entity: 0
-    CCH> A_input> Got packet with seqnum 1
-    CCH> A_input> Invalid checksum, sending a NACK
-
-    EVENT time: 5233.531738,  type: 2, fromlayer3  entity: 0
+    EVENT time: 5222.442383,  type: 2, fromlayer3  entity: 0
     CCH> A_input> Got packet with seqnum 2
-    CCH> A_input> Invalid checksum, sending a NACK
+    CCH> A_input> Invalid checksum, refusing data
 
-    EVENT time: 5237.872070,  type: 2, fromlayer3  entity: 1
-    CCH> B_input> Got packet with seqnum 1
-    CCH> B_input> Checksum is valid
-    CCH> B_input> Received NACK, resending outstanding packets
-
-    EVENT time: 5239.850586,  type: 2, fromlayer3  entity: 1
-    CCH> B_input> Got packet with seqnum 2
-    CCH> B_input> Checksum is valid
-    CCH> B_input> Received NACK, resending outstanding packets
-
-    EVENT time: 5733.531738,  type: 0, timerinterrupt   entity: 0
+    EVENT time: 5512.483887,  type: 0, timerinterrupt   entity: 0
     CCH> A_timerinterrupt> Called
     CCH> A_timerinterrupt> Packet timed out, resending outstanding packets
     Warning: attempt to start a timer that is already started
 
-    EVENT time: 5735.337891,  type: 2, fromlayer3  entity: 1
+    EVENT time: 5522.243164,  type: 2, fromlayer3  entity: 1
     CCH> B_input> Got packet with seqnum 1
     CCH> B_input> Checksum is valid
     CCH> B_input> Packet contains a message, ACKing and passing to app
     Warning: unable to cancel your timer. It wasn't running.
+              TOLAYER3: packet being lost
 
-    EVENT time: 5737.450684,  type: 2, fromlayer3  entity: 1
+    EVENT time: 5523.301758,  type: 2, fromlayer3  entity: 1
     CCH> B_input> Got packet with seqnum 2
     CCH> B_input> Checksum is valid
     CCH> B_input> Packet contains a message, ACKing and passing to app
     Warning: unable to cancel your timer. It wasn't running.
 
-    EVENT time: 5742.029297,  type: 2, fromlayer3  entity: 0
-    CCH> A_input> Got packet with seqnum 1
-    CCH> A_input> Invalid checksum, sending a NACK
-
-    EVENT time: 5747.501953,  type: 2, fromlayer3  entity: 0
+    EVENT time: 5528.575684,  type: 2, fromlayer3  entity: 0
     CCH> A_input> Got packet with seqnum 2
-    CCH> A_input> Invalid checksum, sending a NACK
+    CCH> A_input> Invalid checksum, refusing data
 
-    EVENT time: 5748.013184,  type: 2, fromlayer3  entity: 1
-    CCH> B_input> Got packet with seqnum 1
-    CCH> B_input> Checksum is valid
-    CCH> B_input> Received NACK, resending outstanding packets
+    EVENT time: 6012.483887,  type: 0, timerinterrupt   entity: 0
+    CCH> A_timerinterrupt> Called
+    CCH> A_timerinterrupt> Packet timed out, resending outstanding packets
+              TOLAYER3: packet being lost
+    Warning: attempt to start a timer that is already started
 
-    EVENT time: 5755.875000,  type: 2, fromlayer3  entity: 1
+    EVENT time: 6021.265137,  type: 2, fromlayer3  entity: 1
     CCH> B_input> Got packet with seqnum 2
     CCH> B_input> Checksum is valid
-    CCH> B_input> Received NACK, resending outstanding packets
+    CCH> B_input> Packet contains a message, ACKing and passing to app
+    Warning: unable to cancel your timer. It wasn't running.
 
-    EVENT time: 6080.929688,  type: 1, fromlayer5  entity: 0
+    EVENT time: 6022.776855,  type: 2, fromlayer3  entity: 0
+    CCH> A_input> Got packet with seqnum 2
+    CCH> A_input> Invalid checksum, refusing data
+
+    EVENT time: 6375.851562,  type: 1, fromlayer5  entity: 0
     CCH> A_output> Got message from app layer, sending packet
     CCH> A_output> Appending window
     Warning: attempt to start a timer that is already started
 
-    EVENT time: 6088.752930,  type: 2, fromlayer3  entity: 1
+    EVENT time: 6382.168945,  type: 2, fromlayer3  entity: 1
     CCH> B_input> Got packet with seqnum 3
     CCH> B_input> Checksum is valid
     CCH> B_input> Packet contains a message, ACKing and passing to app
     Warning: unable to cancel your timer. It wasn't running.
 
-    EVENT time: 6096.853516,  type: 2, fromlayer3  entity: 0
+    EVENT time: 6389.287598,  type: 2, fromlayer3  entity: 0
     CCH> A_input> Got packet with seqnum 3
-    CCH> A_input> Invalid checksum, sending a NACK
+    CCH> A_input> Invalid checksum, refusing data
 
-    EVENT time: 6100.571777,  type: 2, fromlayer3  entity: 1
-    CCH> B_input> Got packet with seqnum 3
-    CCH> B_input> Checksum is valid
-    CCH> B_input> Received NACK, resending outstanding packets
-
-    EVENT time: 6596.853516,  type: 0, timerinterrupt   entity: 0
+    EVENT time: 6512.483887,  type: 0, timerinterrupt   entity: 0
     CCH> A_timerinterrupt> Called
     CCH> A_timerinterrupt> Packet timed out, resending outstanding packets
     Warning: attempt to start a timer that is already started
     Warning: attempt to start a timer that is already started
 
-    EVENT time: 6601.550293,  type: 2, fromlayer3  entity: 1
+    EVENT time: 6513.761230,  type: 2, fromlayer3  entity: 1
     CCH> B_input> Got packet with seqnum 1
     CCH> B_input> Checksum is valid
     CCH> B_input> Packet contains a message, ACKing and passing to app
     Warning: unable to cancel your timer. It wasn't running.
 
-    EVENT time: 6604.857422,  type: 2, fromlayer3  entity: 0
+    EVENT time: 6515.567383,  type: 2, fromlayer3  entity: 0
     CCH> A_input> Got packet with seqnum 1
-    CCH> A_input> Invalid checksum, sending a NACK
+    CCH> A_input> Invalid checksum, refusing data
 
-    EVENT time: 6607.053223,  type: 2, fromlayer3  entity: 1
+    EVENT time: 6519.378906,  type: 2, fromlayer3  entity: 1
     CCH> B_input> Got packet with seqnum 2
     CCH> B_input> Checksum is valid
     CCH> B_input> Packet contains a message, ACKing and passing to app
     Warning: unable to cancel your timer. It wasn't running.
 
-    EVENT time: 6610.816895,  type: 2, fromlayer3  entity: 0
+    EVENT time: 6521.357422,  type: 2, fromlayer3  entity: 1
+    CCH> B_input> Got packet with seqnum 3
+    CCH> B_input> Checksum is valid
+    CCH> B_input> Packet contains a message, ACKing and passing to app
+    Warning: unable to cancel your timer. It wasn't running.
+
+    EVENT time: 6521.491699,  type: 2, fromlayer3  entity: 0
     CCH> A_input> Got packet with seqnum 2
-    CCH> A_input> Invalid checksum, sending a NACK
-              TOLAYER3: packet being lost
+    CCH> A_input> Invalid checksum, refusing data
 
-    EVENT time: 6613.668945,  type: 2, fromlayer3  entity: 1
-    CCH> B_input> Got packet with seqnum 3
-    CCH> B_input> Checksum is valid
-    CCH> B_input> Packet contains a message, ACKing and passing to app
-    Warning: unable to cancel your timer. It wasn't running.
-
-    EVENT time: 6620.273926,  type: 2, fromlayer3  entity: 0
+    EVENT time: 6528.183105,  type: 2, fromlayer3  entity: 0
     CCH> A_input> Got packet with seqnum 3
-    CCH> A_input> Invalid checksum, sending a NACK
+    CCH> A_input> Invalid checksum, refusing data
 
-    EVENT time: 6621.448730,  type: 2, fromlayer3  entity: 1
-    CCH> B_input> Got packet with seqnum 1
-    CCH> B_input> Checksum is valid
-    CCH> B_input> Received NACK, resending outstanding packets
-
-    EVENT time: 6625.876953,  type: 2, fromlayer3  entity: 1
-    CCH> B_input> Got packet with seqnum 3
-    CCH> B_input> Checksum is valid
-    CCH> B_input> Received NACK, resending outstanding packets
-
-    EVENT time: 7120.273926,  type: 0, timerinterrupt   entity: 0
-    CCH> A_timerinterrupt> Called
-    CCH> A_timerinterrupt> Packet timed out, resending outstanding packets
-              TOLAYER3: packet being corrupted
-    Warning: attempt to start a timer that is already started
-    Warning: attempt to start a timer that is already started
-
-    EVENT time: 7122.802734,  type: 2, fromlayer3  entity: 1
-    CCH> B_input> Got packet with seqnum 1
-    CCH> B_input> Invalid checksum, sending a NACK
-    Warning: unable to cancel your timer. It wasn't running.
-
-    EVENT time: 7128.641113,  type: 2, fromlayer3  entity: 1
-    CCH> B_input> Got packet with seqnum 2
-    CCH> B_input> Checksum is valid
-    CCH> B_input> Packet contains a message, ACKing and passing to app
-              TOLAYER3: packet being lost
-
-    EVENT time: 7131.176270,  type: 2, fromlayer3  entity: 1
-    CCH> B_input> Got packet with seqnum 3
-    CCH> B_input> Checksum is valid
-    CCH> B_input> Packet contains a message, ACKing and passing to app
-    Warning: unable to cancel your timer. It wasn't running.
-
-    EVENT time: 7132.125000,  type: 2, fromlayer3  entity: 0
-    CCH> A_input> Got packet with seqnum 1
-    CCH> A_input> Checksum is valid
-    CCH> A_input> Received NACK, resending outstanding packets
-              TOLAYER3: packet being corrupted
-    Warning: attempt to start a timer that is already started
-    Warning: attempt to start a timer that is already started
-    Warning: attempt to start a timer that is already started
-
-    EVENT time: 7135.121582,  type: 2, fromlayer3  entity: 0
-    CCH> A_input> Got packet with seqnum 3
-    CCH> A_input> Invalid checksum, sending a NACK
-
-    EVENT time: 7140.380859,  type: 2, fromlayer3  entity: 1
-    CCH> B_input> Got packet with seqnum 1
-    CCH> B_input> Invalid checksum, sending a NACK
-    Warning: unable to cancel your timer. It wasn't running.
-
-    EVENT time: 7144.293457,  type: 2, fromlayer3  entity: 1
-    CCH> B_input> Got packet with seqnum 2
-    CCH> B_input> Checksum is valid
-    CCH> B_input> Packet contains a message, ACKing and passing to app
-
-    EVENT time: 7146.652344,  type: 2, fromlayer3  entity: 0
-    CCH> A_input> Got packet with seqnum 1
-    CCH> A_input> Checksum is valid
-    CCH> A_input> Received NACK, resending outstanding packets
-    Warning: attempt to start a timer that is already started
-    Warning: attempt to start a timer that is already started
-    Warning: attempt to start a timer that is already started
-
-    EVENT time: 7148.832031,  type: 2, fromlayer3  entity: 1
-    CCH> B_input> Got packet with seqnum 3
-    CCH> B_input> Checksum is valid
-    CCH> B_input> Packet contains a message, ACKing and passing to app
-    Warning: unable to cancel your timer. It wasn't running.
-
-    EVENT time: 7152.333984,  type: 2, fromlayer3  entity: 0
-    CCH> A_input> Got packet with seqnum 2
-    CCH> A_input> Invalid checksum, sending a NACK
-
-    EVENT time: 7154.520020,  type: 2, fromlayer3  entity: 1
-    CCH> B_input> Got packet with seqnum 3
-    CCH> B_input> Checksum is valid
-    CCH> B_input> Received NACK, resending outstanding packets
-
-    EVENT time: 7159.458984,  type: 2, fromlayer3  entity: 1
-    CCH> B_input> Got packet with seqnum 1
-    CCH> B_input> Checksum is valid
-    CCH> B_input> Packet contains a message, ACKing and passing to app
-    Warning: unable to cancel your timer. It wasn't running.
-
-    EVENT time: 7160.763672,  type: 2, fromlayer3  entity: 0
-    CCH> A_input> Got packet with seqnum 3
-    CCH> A_input> Invalid checksum, sending a NACK
-
-    EVENT time: 7165.401367,  type: 2, fromlayer3  entity: 1
-    CCH> B_input> Got packet with seqnum 2
-    CCH> B_input> Checksum is valid
-    CCH> B_input> Packet contains a message, ACKing and passing to app
-    Warning: unable to cancel your timer. It wasn't running.
-
-    EVENT time: 7166.473633,  type: 2, fromlayer3  entity: 0
-    CCH> A_input> Got packet with seqnum 1
-    CCH> A_input> Invalid checksum, sending a NACK
-
-    EVENT time: 7169.252441,  type: 2, fromlayer3  entity: 0
-    CCH> A_input> Got packet with seqnum 2
-    CCH> A_input> Invalid checksum, sending a NACK
-
-    EVENT time: 7171.834961,  type: 2, fromlayer3  entity: 1
-    CCH> B_input> Got packet with seqnum 3
-    CCH> B_input> Checksum is valid
-    CCH> B_input> Packet contains a message, ACKing and passing to app
-    Warning: unable to cancel your timer. It wasn't running.
-
-    EVENT time: 7172.979492,  type: 2, fromlayer3  entity: 0
-    CCH> A_input> Got packet with seqnum 3
-    CCH> A_input> Invalid checksum, sending a NACK
-
-    EVENT time: 7178.520508,  type: 2, fromlayer3  entity: 1
-    CCH> B_input> Got packet with seqnum 2
-    CCH> B_input> Checksum is valid
-    CCH> B_input> Received NACK, resending outstanding packets
-
-    EVENT time: 7183.353516,  type: 2, fromlayer3  entity: 1
-    CCH> B_input> Got packet with seqnum 3
-    CCH> B_input> Checksum is valid
-    CCH> B_input> Received NACK, resending outstanding packets
-
-    EVENT time: 7189.858887,  type: 2, fromlayer3  entity: 1
-    CCH> B_input> Got packet with seqnum 1
-    CCH> B_input> Checksum is valid
-    CCH> B_input> Received NACK, resending outstanding packets
-
-    EVENT time: 7191.264648,  type: 2, fromlayer3  entity: 1
-    CCH> B_input> Got packet with seqnum 2
-    CCH> B_input> Checksum is valid
-    CCH> B_input> Received NACK, resending outstanding packets
-
-    EVENT time: 7193.683105,  type: 2, fromlayer3  entity: 1
-    CCH> B_input> Got packet with seqnum 3
-    CCH> B_input> Checksum is valid
-    CCH> B_input> Received NACK, resending outstanding packets
-
-    EVENT time: 7672.979492,  type: 0, timerinterrupt   entity: 0
+    EVENT time: 7012.483887,  type: 0, timerinterrupt   entity: 0
     CCH> A_timerinterrupt> Called
     CCH> A_timerinterrupt> Packet timed out, resending outstanding packets
     Warning: attempt to start a timer that is already started
     Warning: attempt to start a timer that is already started
 
-    EVENT time: 7675.994141,  type: 2, fromlayer3  entity: 1
+    EVENT time: 7017.956543,  type: 2, fromlayer3  entity: 1
     CCH> B_input> Got packet with seqnum 1
     CCH> B_input> Checksum is valid
     CCH> B_input> Packet contains a message, ACKing and passing to app
     Warning: unable to cancel your timer. It wasn't running.
 
-    EVENT time: 7681.727051,  type: 2, fromlayer3  entity: 1
-    CCH> B_input> Got packet with seqnum 2
-    CCH> B_input> Checksum is valid
-    CCH> B_input> Packet contains a message, ACKing and passing to app
-    Warning: unable to cancel your timer. It wasn't running.
-
-    EVENT time: 7682.138184,  type: 2, fromlayer3  entity: 0
+    EVENT time: 7019.480469,  type: 2, fromlayer3  entity: 0
     CCH> A_input> Got packet with seqnum 1
-    CCH> A_input> Invalid checksum, sending a NACK
+    CCH> A_input> Invalid checksum, refusing data
 
-    EVENT time: 7691.331543,  type: 2, fromlayer3  entity: 1
+    EVENT time: 7023.940430,  type: 2, fromlayer3  entity: 1
+    CCH> B_input> Got packet with seqnum 2
+    CCH> B_input> Checksum is valid
+    CCH> B_input> Packet contains a message, ACKing and passing to app
+    Warning: unable to cancel your timer. It wasn't running.
+
+    EVENT time: 7031.802246,  type: 2, fromlayer3  entity: 1
     CCH> B_input> Got packet with seqnum 3
     CCH> B_input> Checksum is valid
     CCH> B_input> Packet contains a message, ACKing and passing to app
     Warning: unable to cancel your timer. It wasn't running.
 
-    EVENT time: 7691.389648,  type: 2, fromlayer3  entity: 0
+    EVENT time: 7033.375000,  type: 2, fromlayer3  entity: 0
     CCH> A_input> Got packet with seqnum 2
-    CCH> A_input> Invalid checksum, sending a NACK
+    CCH> A_input> Invalid checksum, refusing data
 
-    EVENT time: 7692.806152,  type: 2, fromlayer3  entity: 0
+    EVENT time: 7042.200684,  type: 2, fromlayer3  entity: 0
     CCH> A_input> Got packet with seqnum 3
-    CCH> A_input> Invalid checksum, sending a NACK
+    CCH> A_input> Invalid checksum, refusing data
 
-    EVENT time: 7697.864746,  type: 2, fromlayer3  entity: 1
-    CCH> B_input> Got packet with seqnum 1
-    CCH> B_input> Checksum is valid
-    CCH> B_input> Received NACK, resending outstanding packets
-
-    EVENT time: 7702.295898,  type: 2, fromlayer3  entity: 1
-    CCH> B_input> Got packet with seqnum 2
-    CCH> B_input> Checksum is valid
-    CCH> B_input> Received NACK, resending outstanding packets
-
-    EVENT time: 7704.119141,  type: 2, fromlayer3  entity: 1
-    CCH> B_input> Got packet with seqnum 3
-    CCH> B_input> Checksum is valid
-    CCH> B_input> Received NACK, resending outstanding packets
-
-    EVENT time: 7797.618164,  type: 1, fromlayer5  entity: 0
+    EVENT time: 7224.581055,  type: 1, fromlayer5  entity: 0
     CCH> A_output> Got message from app layer, sending packet
     CCH> A_output> Appending window
     Warning: attempt to start a timer that is already started
 
-    EVENT time: 7801.284668,  type: 2, fromlayer3  entity: 1
-     Simulator terminated at time 7801.284668
+    EVENT time: 7229.277832,  type: 2, fromlayer3  entity: 1
+     Simulator terminated at time 7229.277832
      after sending 5 msgs from layer5
 
 

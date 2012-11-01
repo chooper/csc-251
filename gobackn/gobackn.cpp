@@ -46,7 +46,6 @@
 #define MSGSIZE 20
 #define TIMEOUT 500
 #define ACK "ACK"
-#define NACK "NACK" 
 
 /* a "msg" is the data unit passed from layer 5 (teachers code) to layer  */
 /* 4 (students' code).  It contains the data (characters) to be delivered */
@@ -121,15 +120,6 @@ void send_ack(int caller, struct pkt *pkt_to_ack)
 }
 
 
-void send_nack(int caller, struct pkt *pkt_to_nack)
-{
-    int seqnum = pkt_to_nack->seqnum;
-    char msg[MSGSIZE] = {'N','A','C','K',0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-    struct pkt *nack_pkt = make_pkt(seqnum, msg);
-    nack_pkt->acknum = 0;
-    tolayer3(caller, *nack_pkt);
-}
-
 void send_pkt(int caller, struct pkt *pkt_to_send)
 {
     tolayer3(caller, *pkt_to_send);
@@ -199,14 +189,6 @@ void A_input(struct pkt packet)
                 // We received an ACK we don't care about
                 printf("CCH> A_input> Received invalid ACK (ignoring)\n");
             }
-        // isNACK
-        } else if (strncmp(packet.payload, NACK, strlen(ACK)) == 0) {
-            printf("CCH> A_input> Received NACK, resending outstanding packets\n");
-            currWindowElement = A_windowBase;
-            while (currWindowElement) {
-                send_pkt(A, currWindowElement->packet);
-                currWindowElement = currWindowElement->next;
-            }
         } else {
             // Message
             printf("CCH> A_input> Packet contains a message, passing to app\n");
@@ -214,10 +196,7 @@ void A_input(struct pkt packet)
             tolayer5(A, packet.payload);
         }
     } else {
-        printf("CCH> A_input> Invalid checksum, sending a NACK\n");
-        send_nack(A, &packet);
-        stoptimer(A);
-        starttimer(A, TIMEOUT);
+        printf("CCH> A_input> Invalid checksum, refusing data\n");
         return;
     }
 }
@@ -279,14 +258,6 @@ void B_input(struct pkt packet)
                 // We received an ACK we don't care about
                 printf("CCH> B_input> Received invalid ACK (ignoring)\n");
             }
-        // isNACK
-        } else if (strncmp(packet.payload, NACK, strlen(ACK)) == 0) {
-            printf("CCH> B_input> Received NACK, resending outstanding packets\n");
-            currWindowElement = B_windowBase;
-            while (currWindowElement) {
-                send_pkt(B, currWindowElement->packet);
-                currWindowElement = currWindowElement->next;
-            }
         } else {
             // Message
             printf("CCH> B_input> Packet contains a message, ACKing and passing to app\n");
@@ -295,10 +266,7 @@ void B_input(struct pkt packet)
             tolayer5(B, packet.payload);
         }
     } else {
-        printf("CCH> B_input> Invalid checksum, sending a NACK\n");
-        send_nack(B, &packet);
-        stoptimer(B);
-        starttimer(B, TIMEOUT);
+        printf("CCH> B_input> Invalid checksum, refusing dataK\n");
         return;
     }
 }
