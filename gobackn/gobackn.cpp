@@ -74,10 +74,12 @@ struct pkt_hist {
 
 struct pkt_hist *A_windowBase;
 struct pkt_hist *A_windowEnd;
+struct pkt_hist *B_windowBase;
+struct pkt_hist *B_windowEnd;
 
 // Let's store last packet sent so we can resend it later
-//struct pkt *last_pkt;
-struct pkt *last_ack;
+struct pkt *A_last_ack;
+struct pkt *B_last_ack;
 
 int calc_checksum(struct pkt *tgt_pkt)
 {
@@ -181,7 +183,7 @@ void A_input(struct pkt packet)
         if(strncmp(packet.payload, ACK, strlen(ACK)) == 0) {
             if(packet.acknum <= A_windowEnd->packet->seqnum) {
                 printf("CCH> A_input> Packet is an ACK and valid\n");
-                last_ack = &packet;
+                A_last_ack = &packet;
                 if (A_windowBase) {
                     // Update window sequence to drop acknowledged packets
                     currWindowElement = A_windowBase;
@@ -225,7 +227,7 @@ void A_timerinterrupt(void)
     printf("CCH> A_timerinterrupt> Called\n");
     struct pkt_hist *currWindowElement;
 
-    if(!last_ack || (last_ack->acknum < A_windowEnd->packet->seqnum)) {
+    if(!A_last_ack || (A_last_ack->acknum < A_windowEnd->packet->seqnum)) {
         printf("CCH> A_timerinterrupt> Packet timed out, resending outstanding packets\n");
         currWindowElement = A_windowBase;
         while (currWindowElement) {
@@ -242,8 +244,7 @@ void A_init(void)
     printf("CCH> A_init> .\n");
     A_windowBase = NULL;
     A_windowEnd = NULL;
-    //last_pkt = NULL;
-    last_ack = NULL;
+    A_last_ack = NULL;
 }
 
 /* Note that with simplex transfer from a-to-B, there is no B_output() */
@@ -252,17 +253,51 @@ void A_init(void)
 void B_input(struct pkt packet)
 {
     printf("CCH> B_input> Got packet\n");
+    struct pkt_hist *currWindowElement;
 
+    // isChecksumValid
     if(pkt_checksum_valid(&packet)) {
-        printf("CCH> B_input> Checksum valid, sending ACK and passing message to app\n");
-        // Send ACK
-        send_ack(B, &packet);
+        printf("CCH> B_input> Checksum is valid\n");
 
-        // Pass message to layer 5
-        tolayer5(B, packet.payload);
+        // isACK
+        if(strncmp(packet.payload, ACK, strlen(ACK)) == 0) {
+            if(packet.acknum <= B_windowEnd->packet->seqnum) {
+                printf("CCH> B_input> Packet is an ACK and valid\n");
+                B_last_ack = &packet;
+                if (B_windowBase) {
+                    // Update window sequence to drop acknowledged packets
+                    currWindowElement = B_windowBase;
+                    while (currWindowElement && currWindowElement->next && currWindowElement->packet->seqnum < packet.acknum) {
+                        // TODO: Delete old history elements
+                        currWindowElement = B_windowBase->next;
+                        B_windowBase = B_windowBase->next;
+                    }
+                }
+                stoptimer(B);
+            } else {
+                // We received an ACK we don't care about
+                printf("CCH> B_input> Received invalid ACK (ignoring)\n");
+            }
+        // isNACK
+        } else if (strncmp(packet.payload, NACK, strlen(ACK)) == 0) {
+            printf("CCH> B_input> Received NACK, resending outstanding packets\n");
+            currWindowElement = B_windowBase;
+            while (currWindowElement) {
+                send_pkt(B, currWindowElement->packet);
+                currWindowElement = currWindowElement->next;
+            }
+        } else {
+            // Message
+            printf("CCH> B_input> Packet contains a message, passing to app\n");
+            stoptimer(B);
+            tolayer5(B, packet.payload);
+        }
     } else {
-        printf("CCH> B_input> Invalid checksum! Sending NACK\n");
+        printf("CCH> B_input> Invalid checksum, sending a NACK\n");
         send_nack(B, &packet);
+        stoptimer(B);
+        starttimer(B, TIMEOUT);
+        return;
     }
 }
 
@@ -275,6 +310,10 @@ void B_timerinterrupt(void)
 /* entity B routines are called. You can use it to do any initialization */
 void B_init(void)
 {
+    printf("CCH> B_init> .\n");
+    B_windowBase = NULL;
+    B_windowEnd = NULL;
+    B_last_ack = NULL;
 }
 
 
@@ -306,18 +345,6 @@ struct event {
    struct event *next;
  };
 struct event *evlist = NULL;   /* the event list */
-
-// my function prototypes for the simulator
-/*
-int init(void);  
-float jimsrand(void);
-void generate_next_arrival(void);
-void insertevent( struct event *p);
-void stoptimer(int AorB);
-void starttimer(int AorB,float increment);
-void tolayer3(int AorB,struct pkt packet);
-void tolayer5(int AorB,char datasent[]);
-*/
 
 // initialize globals
 int TRACE = 1;             /* for my debugging */
