@@ -172,7 +172,7 @@ void B_output(struct msg message)  /* need be completed only for extra credit */
 /* called from layer 3, when a packet arrives for layer 4 */
 void A_input(struct pkt packet)
 {
-    printf("CCH> A_input> Got packet\n");
+    printf("CCH> A_input> Got packet with seqnum %d\n", packet.seqnum);
     struct pkt_hist *currWindowElement;
 
     // isChecksumValid
@@ -252,7 +252,7 @@ void A_init(void)
 /* called from layer 3, when a packet arrives for layer 4 at B*/
 void B_input(struct pkt packet)
 {
-    printf("CCH> B_input> Got packet\n");
+    printf("CCH> B_input> Got packet with seqnum %d\n", packet.seqnum);
     struct pkt_hist *currWindowElement;
 
     // isChecksumValid
@@ -288,8 +288,9 @@ void B_input(struct pkt packet)
             }
         } else {
             // Message
-            printf("CCH> B_input> Packet contains a message, passing to app\n");
+            printf("CCH> B_input> Packet contains a message, ACKing and passing to app\n");
             stoptimer(B);
+            send_ack(B, &packet);
             tolayer5(B, packet.payload);
         }
     } else {
