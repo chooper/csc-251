@@ -66,20 +66,24 @@ struct pkt {
 
 /*** START Charles Hooper's Code ***/
 
-struct pkt_hist {
+/* The sliding window is implemented as a linked list with pointers to the
+ * base of the window as well as the end (referred to as `base` and
+ * `nextseqnum` in our textbooks) */
+struct windowElement {
     struct pkt *packet;
-    struct pkt_hist *next;
+    struct windowElement *next;
     };
 
-struct pkt_hist *A_windowBase;
-struct pkt_hist *A_windowEnd;
-struct pkt_hist *B_windowBase;
-struct pkt_hist *B_windowEnd;
+struct windowElement *A_windowBase;
+struct windowElement *A_windowEnd;
+struct windowElement *B_windowBase;
+struct windowElement *B_windowEnd;
 
-// Let's store last packet sent so we can resend it later
+// Let's store last acks received
 struct pkt *A_last_ack;
 struct pkt *B_last_ack;
 
+// Checksum is calculated as the sum of the fields (seqnum, acknum, data)
 int calc_checksum(struct pkt *tgt_pkt)
 {
     int checksum = 0;
@@ -90,59 +94,75 @@ int calc_checksum(struct pkt *tgt_pkt)
     return checksum;
 }
 
+// Function that returns bool describing if a given packet's checksum is valid
 bool pkt_checksum_valid(struct pkt *tgt_pkt)
 {
     int expectedChecksum = calc_checksum(tgt_pkt);
     return (expectedChecksum == tgt_pkt->checksum);
 }
 
+// Returns a pointer to a newly initialized packet
 struct pkt *make_pkt(int seqnum, char data[MSGSIZE])
 {
-    // make_pkt: Returns a pointer to a newly initialized packet
+    // init/copy data into fields
     struct pkt *gen_pkt;
     gen_pkt = new struct pkt;
     gen_pkt->seqnum = seqnum;
     gen_pkt->acknum = 0;
+
+    // copy payload into packet
     for(int i = 0; i < sizeof(gen_pkt->payload) / sizeof(char); i++) {
         gen_pkt->payload[i] = data[i];
     }
+
+    // calculate checksum
     gen_pkt->checksum = calc_checksum(gen_pkt);
     return gen_pkt;
 }
 
+// Sends an ACK by `caller` in response to `pkt_to_ack`
 void send_ack(int caller, struct pkt *pkt_to_ack)
 {
     int seqnum = pkt_to_ack->seqnum;
     char msg[MSGSIZE] = {'A','C','K',0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+
+    // Build packet
     struct pkt *ack_pkt = make_pkt(seqnum, msg);
     ack_pkt->acknum = pkt_to_ack->seqnum;
+
+    // We modified the packet so recalc checksum
+    ack_pkt->checksum = calc_checksum(ack_pkt);
+
+    // Send
     tolayer3(caller, *ack_pkt);
 }
 
-
+// Sends `pkt_to_send` by `caller` and starts timer for detecting timeouts
 void send_pkt(int caller, struct pkt *pkt_to_send)
 {
     tolayer3(caller, *pkt_to_send);
     starttimer(caller, TIMEOUT);
 }
-    
-/* called from layer 5, passed the data to be sent to other side */
+
+
+// Transport layer interface called by the app layer ("layer 5")
 void A_output(struct msg message)
 {
     printf("CCH> A_output> Got message from app layer, sending packet\n");
     struct pkt *out_pkt;
-    struct pkt_hist *currentElement;
+    struct windowElement *currentElement;
     int seqnum;
 
+    // Build packet: Seqnum is "nextseqnum" or zero
     seqnum = A_windowEnd ? (A_windowEnd->packet->seqnum + 1) : 0;
     out_pkt = make_pkt(seqnum, message.data);
 
-    // Build current pkt_hist element
-    currentElement = new struct pkt_hist;
+    // Allocate element to add to the sliding window
+    currentElement = new struct windowElement;
     currentElement->packet = out_pkt;
     currentElement->next = NULL;
 
-    // If this is our first packet, set it as the base of the window
+    // If this is our first packet, set it as the base of the sliding window
     if (! A_windowBase) {
         printf("CCH> A_output> Setting A_windowbase\n");
         A_windowBase = currentElement;
@@ -153,8 +173,9 @@ void A_output(struct msg message)
         printf("CCH> A_output> Appending window\n");
         A_windowEnd->next = currentElement;
     }
-    A_windowEnd = currentElement;
 
+    // TODO: Enforcement of `N`
+    A_windowEnd = currentElement;
     send_pkt(A, out_pkt);
 }
 
@@ -163,22 +184,25 @@ void B_output(struct msg message)  /* need be completed only for extra credit */
     printf("CCH> B_output> Got message (noop)\n");
 }
 
-/* called from layer 3, when a packet arrives for layer 4 */
+// Transport layer interface called by network layer ("Layer 3") when it receives a packet
 void A_input(struct pkt packet)
 {
     printf("CCH> A_input> Got packet with seqnum %d\n", packet.seqnum);
-    struct pkt_hist *currWindowElement;
+    struct windowElement *currWindowElement;
 
-    // isChecksumValid
+    // Validate received packet's checksum
     if(pkt_checksum_valid(&packet)) {
         printf("CCH> A_input> Checksum is valid\n");
 
-        // isACK
+        // Check if the packet is an ACK
         if(strncmp(packet.payload, ACK, strlen(ACK)) == 0) {
+
+            // Packet is ACK; Check for valid sequence number in acknum (must be < "nextseqnum")
             if(packet.acknum <= A_windowEnd->packet->seqnum) {
+
+                // ACK seqnum is valid: Slide base up to acknum
                 printf("CCH> A_input> Packet is an ACK and valid\n");
                 A_last_ack = &packet;
-                // Update window sequence to drop acknowledged packets
                 currWindowElement = A_windowBase;
                 while (currWindowElement && currWindowElement->packet->seqnum <= packet.acknum) {
                     A_windowBase = A_windowBase->next;
@@ -186,28 +210,31 @@ void A_input(struct pkt packet)
                 }
                 stoptimer(A);
             } else {
-                // We received an ACK we don't care about
+                // acknum was out of bounds: ignore it
                 printf("CCH> A_input> Received invalid ACK (ignoring)\n");
             }
         } else {
-            // Message
+            // Packet is a message: send to app
+            // TODO: If bidirectional is to be implemented, an ACK needs to be send here
             printf("CCH> A_input> Packet contains a message, passing to app\n");
             stoptimer(A);
             tolayer5(A, packet.payload);
         }
     } else {
+        // Checksum was invalid: ignore data
         printf("CCH> A_input> Invalid checksum, refusing data\n");
-        return;
     }
 }
 
-/* called when A's timer goes off */
+// Called whenever a timer expires, helpful for timeouts
 void A_timerinterrupt(void)
 {
     printf("CCH> A_timerinterrupt> Called\n");
-    struct pkt_hist *currWindowElement;
+    struct windowElement *currWindowElement;
 
+    // Check if we have unacknowledged packets outstanding
     if(!A_last_ack || (A_last_ack->acknum <= A_windowEnd->packet->seqnum)) {
+        // Unacknowledged packets exist: Resend each one
         printf("CCH> A_timerinterrupt> Packet timed out, resending outstanding packets\n");
         currWindowElement = A_windowBase;
         while (currWindowElement) {
@@ -217,11 +244,10 @@ void A_timerinterrupt(void)
     }
 }  
 
-/* the following routine will be called once (only) before any other */
-/* entity A routines are called. You can use it to do any initialization */
+// Initialize "A's" network stack
 void A_init(void)
 {
-    printf("CCH> A_init> .\n");
+    printf("CCH> A_init> init\n");
     A_windowBase = NULL;
     A_windowEnd = NULL;
     A_last_ack = NULL;
@@ -229,55 +255,55 @@ void A_init(void)
 
 /* Note that with simplex transfer from a-to-B, there is no B_output() */
 
-/* called from layer 3, when a packet arrives for layer 4 at B*/
+// "B's" layer 4 interface called by layer 3
 void B_input(struct pkt packet)
 {
     printf("CCH> B_input> Got packet with seqnum %d\n", packet.seqnum);
-    struct pkt_hist *currWindowElement;
+    struct windowElement *currWindowElement;
 
-    // isChecksumValid
+    // Validate received packet's checksum
     if(pkt_checksum_valid(&packet)) {
         printf("CCH> B_input> Checksum is valid\n");
 
-        // isACK
+        // Check if the packet is an ACK
         if(strncmp(packet.payload, ACK, strlen(ACK)) == 0) {
+
+            // Packet is ACK; Check for valid sequence number in acknum (must be < "nextseqnum")
             if(packet.acknum <= B_windowEnd->packet->seqnum) {
+
+                // ACK seqnum is valid: Slide base up to acknum
                 printf("CCH> B_input> Packet is an ACK and valid\n");
                 B_last_ack = &packet;
-                if (B_windowBase) {
-                    // Update window sequence to drop acknowledged packets
+                currWindowElement = B_windowBase;
+                while (currWindowElement && currWindowElement->packet->seqnum <= packet.acknum) {
+                    B_windowBase = B_windowBase->next;
                     currWindowElement = B_windowBase;
-                    while (currWindowElement && currWindowElement->next && currWindowElement->packet->seqnum <= packet.acknum) {
-                        // TODO: Delete old history elements
-                        currWindowElement = B_windowBase->next;
-                        B_windowBase = B_windowBase->next;
-                    }
                 }
                 stoptimer(B);
             } else {
-                // We received an ACK we don't care about
+                // acknum was out of bounds: ignore it
                 printf("CCH> B_input> Received invalid ACK (ignoring)\n");
             }
         } else {
-            // Message
-            printf("CCH> B_input> Packet contains a message, ACKing and passing to app\n");
+            // Packet is a message: send to app
+            // TODO: If bidirectional is to be implemented, an ACK needs to be send here
+            printf("CCH> B_input> Packet contains a message, passing to app\n");
             stoptimer(B);
-            send_ack(B, &packet);
             tolayer5(B, packet.payload);
         }
     } else {
-        printf("CCH> B_input> Invalid checksum, refusing dataK\n");
-        return;
+        // Checksum was invalid: ignore data
+        printf("CCH> B_input> Invalid checksum, refusing data\n");
     }
 }
 
-/* called when B's timer goes off */
+// Called whenever a timer expires, helpful for timeouts
 void B_timerinterrupt(void)
 {
+    // TODO: "B" needs to handle timeouts if bidirectional transfer is desired
 }
 
-/* the following rouytine will be called once (only) before any other */
-/* entity B routines are called. You can use it to do any initialization */
+// Initialize "B's" network stack
 void B_init(void)
 {
     printf("CCH> B_init> .\n");
