@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <cstring>
-#include "altbit.h"
+#include "gobackn.h"
 //#include "stdafx.h"
 
 // The following allows this to run on Linux
