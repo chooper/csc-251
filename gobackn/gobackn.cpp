@@ -153,12 +153,16 @@ void A_output(struct msg message)
     currentElement->next = NULL;
 
     // If this is our first packet, set it as the base of the window
-    if (!A_windowBase)
+    if (! A_windowBase) {
+        printf("CCH> A_output> Setting A_windowbase\n");
         A_windowBase = currentElement;
+    }
 
     // Append current element onto end of window sequence
-    if (A_windowEnd)
+    if (A_windowEnd) {
+        printf("CCH> A_output> Appending window\n");
         A_windowEnd->next = currentElement;
+    }
     A_windowEnd = currentElement;
 
     send_pkt(A, out_pkt);
@@ -184,14 +188,11 @@ void A_input(struct pkt packet)
             if(packet.acknum <= A_windowEnd->packet->seqnum) {
                 printf("CCH> A_input> Packet is an ACK and valid\n");
                 A_last_ack = &packet;
-                if (A_windowBase) {
-                    // Update window sequence to drop acknowledged packets
+                // Update window sequence to drop acknowledged packets
+                currWindowElement = A_windowBase;
+                while (currWindowElement && currWindowElement->packet->seqnum <= packet.acknum) {
+                    A_windowBase = A_windowBase->next;
                     currWindowElement = A_windowBase;
-                    while (currWindowElement && currWindowElement->next && currWindowElement->packet->seqnum < packet.acknum) {
-                        // TODO: Delete old history elements
-                        currWindowElement = A_windowBase->next;
-                        A_windowBase = A_windowBase->next;
-                    }
                 }
                 stoptimer(A);
             } else {
@@ -227,7 +228,7 @@ void A_timerinterrupt(void)
     printf("CCH> A_timerinterrupt> Called\n");
     struct pkt_hist *currWindowElement;
 
-    if(!A_last_ack || (A_last_ack->acknum < A_windowEnd->packet->seqnum)) {
+    if(!A_last_ack || (A_last_ack->acknum <= A_windowEnd->packet->seqnum)) {
         printf("CCH> A_timerinterrupt> Packet timed out, resending outstanding packets\n");
         currWindowElement = A_windowBase;
         while (currWindowElement) {
@@ -267,7 +268,7 @@ void B_input(struct pkt packet)
                 if (B_windowBase) {
                     // Update window sequence to drop acknowledged packets
                     currWindowElement = B_windowBase;
-                    while (currWindowElement && currWindowElement->next && currWindowElement->packet->seqnum < packet.acknum) {
+                    while (currWindowElement && currWindowElement->next && currWindowElement->packet->seqnum <= packet.acknum) {
                         // TODO: Delete old history elements
                         currWindowElement = B_windowBase->next;
                         B_windowBase = B_windowBase->next;
