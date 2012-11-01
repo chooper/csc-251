@@ -72,8 +72,8 @@ struct pkt_hist {
     struct pkt_hist *next;
     };
 
-struct pkt_hist *windowBase;
-struct pkt_hist *windowEnd;
+struct pkt_hist *A_windowBase;
+struct pkt_hist *A_windowEnd;
 
 // Let's store last packet sent so we can resend it later
 //struct pkt *last_pkt;
@@ -142,7 +142,7 @@ void A_output(struct msg message)
     struct pkt_hist *currentElement;
     int seqnum;
 
-    seqnum = windowEnd ? (windowEnd->packet->seqnum + 1) : 0;
+    seqnum = A_windowEnd ? (A_windowEnd->packet->seqnum + 1) : 0;
     out_pkt = make_pkt(seqnum, message.data);
 
     // Build current pkt_hist element
@@ -151,13 +151,13 @@ void A_output(struct msg message)
     currentElement->next = NULL;
 
     // If this is our first packet, set it as the base of the window
-    if (!windowBase)
-        windowBase = currentElement;
+    if (!A_windowBase)
+        A_windowBase = currentElement;
 
     // Append current element onto end of window sequence
-    if (windowEnd)
-        windowEnd->next = currentElement;
-    windowEnd = currentElement;
+    if (A_windowEnd)
+        A_windowEnd->next = currentElement;
+    A_windowEnd = currentElement;
 
     send_pkt(A, out_pkt);
 }
@@ -179,16 +179,16 @@ void A_input(struct pkt packet)
 
         // isACK
         if(strncmp(packet.payload, ACK, strlen(ACK)) == 0) {
-            if(packet.acknum <= windowEnd->packet->seqnum) {
+            if(packet.acknum <= A_windowEnd->packet->seqnum) {
                 printf("CCH> A_input> Packet is an ACK and valid\n");
                 last_ack = &packet;
-                if (windowBase) {
+                if (A_windowBase) {
                     // Update window sequence to drop acknowledged packets
-                    currWindowElement = windowBase;
+                    currWindowElement = A_windowBase;
                     while (currWindowElement && currWindowElement->next && currWindowElement->packet->seqnum < packet.acknum) {
                         // TODO: Delete old history elements
-                        currWindowElement = windowBase->next;
-                        windowBase = windowBase->next;
+                        currWindowElement = A_windowBase->next;
+                        A_windowBase = A_windowBase->next;
                     }
                 }
                 stoptimer(A);
@@ -199,7 +199,7 @@ void A_input(struct pkt packet)
         // isNACK
         } else if (strncmp(packet.payload, NACK, strlen(ACK)) == 0) {
             printf("CCH> A_input> Received NACK, resending outstanding packets\n");
-            currWindowElement = windowBase;
+            currWindowElement = A_windowBase;
             while (currWindowElement) {
                 send_pkt(A, currWindowElement->packet);
                 currWindowElement = currWindowElement->next;
@@ -225,9 +225,9 @@ void A_timerinterrupt(void)
     printf("CCH> A_timerinterrupt> Called\n");
     struct pkt_hist *currWindowElement;
 
-    if(!last_ack || (last_ack->acknum < windowEnd->packet->seqnum)) {
+    if(!last_ack || (last_ack->acknum < A_windowEnd->packet->seqnum)) {
         printf("CCH> A_timerinterrupt> Packet timed out, resending outstanding packets\n");
-        currWindowElement = windowBase;
+        currWindowElement = A_windowBase;
         while (currWindowElement) {
             send_pkt(A, currWindowElement->packet);
             currWindowElement = currWindowElement->next;
@@ -240,8 +240,8 @@ void A_timerinterrupt(void)
 void A_init(void)
 {
     printf("CCH> A_init> .\n");
-    windowBase = NULL;
-    windowEnd = NULL;
+    A_windowBase = NULL;
+    A_windowEnd = NULL;
     //last_pkt = NULL;
     last_ack = NULL;
 }
