@@ -83,6 +83,43 @@ struct windowElement *B_windowEnd;
 struct pkt *A_last_ack;
 struct pkt *B_last_ack;
 
+// Get highest unused seqnum. start is ptr to where in window to start search
+int get_next_seqnum(struct windowElement *start)
+{
+    int seqnum = 0;
+
+    while (start) {
+        seqnum = start->packet->seqnum + 1;
+        start = start->next;
+    }
+
+    return seqnum;
+}
+
+// Return the size of the window in # of packets
+int windowlen(int AorB)
+{
+    struct windowElement *start, *end;
+    int sz = 0;
+
+    if (AorB == A) {
+        start = A_windowBase;
+        end = A_windowEnd;
+    } else if (AorB == B) {
+        start = B_windowBase;
+        end = B_windowEnd;
+    } else {
+        printf("Invalid window target!\n");
+        return -1;
+    }
+
+    while (start && start->packet->seqnum <= end->packet->seqnum) {
+        sz++;
+        start = start->next;
+    }
+    return sz;
+}
+
 // Checksum is calculated as the sum of the fields (seqnum, acknum, data)
 int calc_checksum(struct pkt *tgt_pkt)
 {
@@ -150,33 +187,47 @@ void A_output(struct msg message)
 {
     printf("CCH> A_output> Got message from app layer, sending packet\n");
     struct pkt *out_pkt;
-    struct windowElement *currentElement;
+    struct windowElement *newElement, *flushElement;
     int seqnum;
 
     // Build packet: Seqnum is "nextseqnum" or zero
-    seqnum = A_windowEnd ? (A_windowEnd->packet->seqnum + 1) : 0;
+    seqnum = get_next_seqnum(A_windowEnd);
+    //seqnum = A_windowEnd ? (A_windowEnd->packet->seqnum + 1) : 0;
     out_pkt = make_pkt(seqnum, message.data);
 
     // Allocate element to add to the sliding window
-    currentElement = new struct windowElement;
-    currentElement->packet = out_pkt;
-    currentElement->next = NULL;
+    newElement = new struct windowElement;
+    newElement->packet = out_pkt;
+    newElement->next = NULL;
 
     // If this is our first packet, set it as the base of the sliding window
     if (! A_windowBase) {
         printf("CCH> A_output> Setting A_windowbase\n");
-        A_windowBase = currentElement;
+        A_windowBase = newElement;
+
+        // Since this is our first packet, we can also send it immediately
+        // and update the end of the window
+        send_pkt(A, out_pkt);
+        A_windowEnd = newElement;
+    } else {
+        // Append current element onto end of window sequence
+        if (A_windowEnd) {
+            printf("CCH> A_output> Appending window\n");
+            A_windowEnd->next = newElement;
+        }
     }
 
-    // Append current element onto end of window sequence
-    if (A_windowEnd) {
-        printf("CCH> A_output> Appending window\n");
-        A_windowEnd->next = currentElement;
+    // See if there is room in the window to flush unsent packets (>= nextseqnum)
+    while(windowlen(A) <= WINDOWSIZE) {
+        if (A_windowEnd && A_windowEnd->next) {
+            // Send unsent packet
+            send_pkt(A, A_windowEnd->next->packet);
+            // Slide end of window up
+            A_windowEnd = A_windowEnd->next;
+        } else {
+            break;
+        }
     }
-
-    // TODO: Enforcement of `N`
-    A_windowEnd = currentElement;
-    send_pkt(A, out_pkt);
 }
 
 void B_output(struct msg message)  /* need be completed only for extra credit */
@@ -289,6 +340,7 @@ void B_input(struct pkt packet)
             // TODO: If bidirectional is to be implemented, an ACK needs to be send here
             printf("CCH> B_input> Packet contains a message, passing to app\n");
             stoptimer(B);
+            send_ack(B, &packet);
             tolayer5(B, packet.payload);
         }
     } else {
