@@ -7,8 +7,8 @@
 #              Completed by hooperc
 #
 # Created:     28/09/2012
-# Updated:     XX/XX/XXXX
-# Copyright:   (c) rosienej 2012
+# Updated:     12/10/2012
+# Copyright:   (c) rosienej 2012, hooperc 2012
 #-------------------------------------------------------------------------------
 
 from socket import *
@@ -35,15 +35,15 @@ def sendCommand(SMTPClientSocket, cmd):
 def main():
     # Choose your message settings
     socket_timeout = 10 # in seconds
-    from_address = 'cchooper@dynamic-alliance.com'
-    to_address = 'chooper@plumata.com'
-    msg = "\r\n I love computer networks!"
+    from_address = 'user@example.com'
+    to_address = 'user@example.com'
+    msg = "\r\n Hello, real world!"
     endmsg = "\r\n.\r\n"
 
     # Choose a mail server (e.g. Google mail server) and call it mailserver
     # CCH: You can't use gmail unless you use SSL/TLS
     # CCH: Can't use outlook.com (school email) unless you use authentication
-    mailServer = 'mxbackup1.plumata.net'
+    mailServer = 'smtp.example.com'
     mailPort = 25
 
     # Set socket options

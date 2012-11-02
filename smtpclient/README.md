@@ -10,10 +10,10 @@ Once configured, you can test it like so:
 
     $ ./smtpclient.py 
     => HELO Joshua
-    <= 220 mxbackup1.plumata.net ESMTP Postfix (Ubuntu)
-    => MAIL FROM: cchooper@dynamic-alliance.com
-    <= 250 mxbackup1.plumata.net
-    => RCPT TO: chooper@plumata.com
+    <= 220 mail.example.com ESMTP Postfix (Ubuntu)
+    => MAIL FROM: user@example.com
+    <= 250 mail.example.com
+    => RCPT TO: user@example.com
     <= 250 2.1.0 Ok
     => DATA
     <= 250 2.1.5 Ok
