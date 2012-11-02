@@ -54,7 +54,7 @@ def main():
     SMTPClientSocket.connect((mailServer,mailPort))
     # Display banner
     banner = SMTPClientSocket.recv(1024)
-    print '=>', banner.strip()
+    print '<=', banner.strip()
 
     # Send HELO command and print server response.
     heloCommand = 'HELO Joshua\r\n'
