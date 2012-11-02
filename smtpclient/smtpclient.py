@@ -52,6 +52,9 @@ def main():
     # Create socket and establish a TCP connection with mailserver
     SMTPClientSocket = socket(AF_INET,SOCK_STREAM)
     SMTPClientSocket.connect((mailServer,mailPort))
+    # Display banner
+    banner = SMTPClientSocket.recv(1024)
+    print '=>', banner.strip()
 
     # Send HELO command and print server response.
     heloCommand = 'HELO Joshua\r\n'

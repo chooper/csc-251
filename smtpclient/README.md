@@ -9,21 +9,18 @@ Usage & Testing
 Once configured, you can test it like so:
 
     $ ./smtpclient.py 
+    <= 220 smtp.example.com ESMTP Postfix (Ubuntu)
     => HELO Joshua
-    <= 220 mail.example.com ESMTP Postfix (Ubuntu)
+    <= 250 smtp.example.com
     => MAIL FROM: user@example.com
-    <= 250 mail.example.com
-    => RCPT TO: user@example.com
     <= 250 2.1.0 Ok
-    => DATA
+    => RCPT TO: user@example.com
     <= 250 2.1.5 Ok
+    => DATA
+    <= 354 End data with <CR><LF>.<CR><LF>
     => <message>
     => .
-    <= 354 End data with <CR><LF>.<CR><LF>
+    <= 250 2.0.0 Ok: queued as 9289E816E
     => QUIT
-    <= 250 2.0.0 Ok: queued as 9FA6886B2
-
-You'll note that output isn't in the exact order as the SMTP spec.
-That's OK! It's actually sending in correct order, but we're not
-printing the responses in order.
+    <= 221 2.0.0 Bye
 
