@@ -1,0 +1,50 @@
+C:\Users\chooper\Desktop\Lab2\Debug>lab2
+Enter TRACE:2
+MAIN: rcv event, t=0.094, at 1 src: 0, dest: 1, contents:   0   1   3   7
+
+ NODE 1 found a better way to NODE 3,through NODE 0MAIN: rcv event, t=0.427, at
+1 src: 2, dest: 1, contents:   3   1   0   2
+
+ NODE 1 found a better way to NODE 3,through NODE 2MAIN: rcv event, t=0.998, at
+0 src: 1, dest: 0, contents:   1   0   1  -1
+
+ NODE 0 found a better way to NODE 2,through NODE 1MAIN: rcv event, t=1.244, at
+3 src: 0, dest: 3, contents:   0   1   3   7
+
+ NODE 3 found a better way to NODE 1,through NODE 0MAIN: rcv event, t=1.514, at
+2 src: 0, dest: 2, contents:   0   1   3   7
+MAIN: rcv event, t=1.685, at 0 src: 2, dest: 0, contents:   3   1   0   2
+
+ NODE 0 found a better way to NODE 3,through NODE 2MAIN: rcv event, t=2.171, at
+3 src: 2, dest: 3, contents:   3   1   0   2
+
+ NODE 3 found a better way to NODE 0,through NODE 2
+ NODE 3 found a better way to NODE 1,through NODE 2MAIN: rcv event, t=2.399, at
+0 src: 3, dest: 0, contents:   7  -1   2   0
+MAIN: rcv event, t=2.489, at 0 src: 1, dest: 0, contents:   1   0   1   8
+MAIN: rcv event, t=2.667, at 2 src: 1, dest: 2, contents:   1   0   1  -1
+
+ NODE 2 found a better way to NODE 0,through NODE 1MAIN: rcv event, t=2.823, at
+1 src: 0, dest: 1, contents:   0   1   2   7
+MAIN: rcv event, t=3.361, at 0 src: 1, dest: 0, contents:   1   0   1   3
+MAIN: rcv event, t=3.780, at 3 src: 0, dest: 3, contents:   0   1   2   7
+MAIN: rcv event, t=3.798, at 2 src: 3, dest: 2, contents:   7  -1   2   0
+MAIN: rcv event, t=3.915, at 0 src: 3, dest: 0, contents:   7   8   2   0
+MAIN: rcv event, t=4.098, at 1 src: 0, dest: 1, contents:   0   1   2   4
+MAIN: rcv event, t=4.650, at 1 src: 2, dest: 1, contents:   2   1   0   2
+MAIN: rcv event, t=4.774, at 2 src: 1, dest: 2, contents:   1   0   1   8
+MAIN: rcv event, t=5.464, at 3 src: 0, dest: 3, contents:   0   1   2   4
+MAIN: rcv event, t=5.640, at 0 src: 3, dest: 0, contents:   5   3   2   0
+MAIN: rcv event, t=5.760, at 2 src: 1, dest: 2, contents:   1   0   1   3
+MAIN: rcv event, t=6.315, at 3 src: 2, dest: 3, contents:   2   1   0   2
+
+ NODE 3 found a better way to NODE 0,through NODE 2MAIN: rcv event, t=6.435, at
+0 src: 2, dest: 0, contents:   2   1   0   2
+MAIN: rcv event, t=6.771, at 2 src: 0, dest: 2, contents:   0   1   2   7
+MAIN: rcv event, t=7.650, at 2 src: 3, dest: 2, contents:   7   8   2   0
+MAIN: rcv event, t=7.997, at 0 src: 3, dest: 0, contents:   4   3   2   0
+MAIN: rcv event, t=8.069, at 2 src: 0, dest: 2, contents:   0   1   2   4
+MAIN: rcv event, t=9.377, at 2 src: 3, dest: 2, contents:   5   3   2   0
+MAIN: rcv event, t=10.016, at 2 src: 3, dest: 2, contents:   4   3   2   0
+MAIN: rcv event, t=10000.000, at -1MAIN: rcv event, t=20000.000, at -842150451
+Simulator terminated at t=20000.000000, no packets in medium
